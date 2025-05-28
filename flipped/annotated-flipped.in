@@ -2,12 +2,12 @@
 ### CONSTANTS ###
 #################
 
-param pi=3.141592654
-param degrad=$pi/180
-param refP=200.0
+param pi=3.141592654 # ok
+param degrad=$pi/180 # ok
+param refP=200.0     ##### Why this value?
 
-param beamxp=0.0
-param beamyp=-0.0073
+param beamxp=0.0             ##### Don't know what these two are. 
+param beamyp=-0.0073	     ##### ?
 ######################
 ### INITIALIZATION ###
 ######################
@@ -21,7 +21,7 @@ randomseed time
 ## disable=Decay
 
 # decay/stochastics disabled:
-physics QGSP_BIC doStochastics=0 
+physics QGSP_BIC doStochastics=0 ##### How is QGSP different from QGSP_BIC?
 
 # Reference Particle (25th harmonic - 201.25 MHz)
 reference particle=mu+ \
@@ -29,7 +29,7 @@ reference particle=mu+ \
 	beamY=0 \
 	beamZ=0.0 \
 	beamXp=0 beamYp=0 \
-	referenceMomentum=$refP
+	referenceMomentum=$refP ##### refP = 200. approximation? why not exactly 201.25?
 
 particlecolor reference=1,1,1
 
@@ -37,9 +37,9 @@ beam gaussian particle=mu+ nEvents=100 beamX=1.50 beamY=0 beamZ=0 beamXp=$beamxp
      sigmaX=20.0 sigmaY=20. sigmaXp=0.1 sigmaYp=0.1 meanMomentum=$refP sigmaP=0.0 meanT=0.0 sigmaT=0.0
 
 # kill secondaries
-trackcuts killSecondaries=1
+trackcuts killSecondaries=1 ##### What are secondaries?
 
-trace format=ascii nTrace=10 oneNTuple=0
+trace format=ascii nTrace=10 oneNTuple=1 ##### Why is oneNTuple=1?
 
 ############################
 ### GEOMETRY DEFINITIONS ###
@@ -62,6 +62,7 @@ solenoid FOFOdCoil coilName=Coil1 current=-$solcurrent
 virtualdetector betmin radius=300 length=0.001 color='' format=ascii
 virtualdetector betmax radius=300 length=0.001 color='' format=ascii
 
+##### Are there any actual differences between betmin and betmax or are 'min' and 'max' just for reference?
 
 ################################
 ### ELEMENT PLACING SEQUENCE ###

@@ -80,16 +80,18 @@ z, bz = df['z'], df['Bz']
 # len = 43701
 
 N = int(ceil_to_scale(len(df))) #This defines the total 'number of indices' to scan over --> here it's 50000.
-r, c = 2, 5 #These are the number of rows, columns respectively to go into the subfigure. 
+r, c = 3, 4 #These are the number of rows, columns respectively to go into the subfigure. 
 n = r * c #Total number of subfigures you want. 
-step_size = int(N / n) #Calculates what the size of each slice is. 
+#step_size = int(N / n) #Calculates what the size of each slice is. 
+
+step_size = 2000
 
 ranges = []
 for i in range(n): #Gets min and max indices for each slice
     ranges.append([i*step_size, i*step_size + step_size])
 
 ##### PLOT #########
-fig, axes = plt.subplots(r, c, figsize=(15, 4))  
+fig, axes = plt.subplots(r, c, figsize=(12, 9))  
 axes = axes.flatten()
 
 for i, vals in enumerate(ranges): #Gets the slice and plots it
