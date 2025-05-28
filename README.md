@@ -1,7 +1,9 @@
 # Muon collider accelerator studies
 
-Caroline's [GitHub](https://github.com/criggall/muon-cooling?tab=readme-ov-file)
-g4beamline [documentation](https://www.muonsinc.com/Website1/Muons/G4beamlineUsersGuide.pdf)
+Caroline's [GitHub](https://github.com/criggall/muon-cooling?tab=readme-ov-file) <br>
+Solenoid study [GitHub](https://github.com/criggall/solenoid-study)  
+g4beamline [documentation](https://www.muonsinc.com/Website1/Muons/G4beamlineUsersGuide.pdf) <br>
+
 
 ### Relevant papers
 

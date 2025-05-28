@@ -27,6 +27,6 @@ Meeting 05/28
 To-do:
 
 - [x] ~Join Slack~
-- [ ] Find GitHub
+- [x] ~Find GitHub~
 - [ ] Look at Fernow's paper
 - [ ] 
