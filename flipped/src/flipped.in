@@ -2,6 +2,8 @@
 ### CONSTANTS ###
 #################
 
+param outdir=../output
+
 param pi=3.141592654
 param degrad=$pi/180
 param refP=200.0
@@ -33,13 +35,13 @@ reference particle=mu+ \
 
 particlecolor reference=1,1,1
 
-beam gaussian particle=mu+ nEvents=100 beamX=1.50 beamY=0 beamZ=0 beamXp=$beamxp  beamYp=$beamyp \
+beam gaussian particle=mu+ nEvents=10 beamX=1.50 beamY=0 beamZ=0 beamXp=$beamxp  beamYp=$beamyp \
      sigmaX=20.0 sigmaY=20. sigmaXp=0.1 sigmaYp=0.1 meanMomentum=$refP sigmaP=0.0 meanT=0.0 sigmaT=0.0
 
 # kill secondaries
 trackcuts killSecondaries=1
 
-trace format=ascii nTrace=10 oneNTuple=0
+trace format=ascii nTrace=1 oneNTuple=1 filename=$outdir/AllTracks.txt
 
 ############################
 ### GEOMETRY DEFINITIONS ###
@@ -52,15 +54,15 @@ param sollength=400.0
 param period=2000.0
 param solcurrent=100.0
 param maxStep=5.0
-coil Coil1 innerRadius=$solinner outerRadius=$solinner+$solthick length=$sollength maxR=5000 maxZ=10000.0
+coil Coil1 innerRadius=$solinner outerRadius=$solinner+$solthick length=$sollength maxR=5000 maxZ=10000.0 filename=$outdir/Coil1.dat
 solenoid FOFOfCoil coilName=Coil1 current=$solcurrent
 solenoid FOFOdCoil coilName=Coil1 current=-$solcurrent
 
 # detector and filter
 #virtualdetector det radius=500 length=0.001 color=0,1,0 format=ascii
 #particlefilter filter radius=1000 length=0.001 color=1,1,1 kill=mu+ nWait=$nWait referenceWait=1
-virtualdetector betmin radius=300 length=0.001 color='' format=ascii
-virtualdetector betmax radius=300 length=0.001 color='' format=ascii
+virtualdetector betmin radius=300 length=0.001 color='' format=ascii filename=$outdir/betmin.txt
+virtualdetector betmax radius=300 length=0.001 color='' format=ascii filename=$outdir/betmax.txt
 
 
 ################################
