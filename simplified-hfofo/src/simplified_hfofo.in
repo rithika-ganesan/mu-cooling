@@ -1,3 +1,6 @@
+param abspath=/Users/rithika/utkcms/hfofo/simplified-hfofo/src
+param outdir=../output
+
 ### PHYSICS ###
 
 physics QGSP_BIC doStochastics=0
@@ -52,24 +55,24 @@ meanMomentum=$p sigmaP=0.0 meanT=0.0 sigmaT=1.0
 reference referenceMomentum=$p particle=mu+ beamX=$X beamY=$Y beamZ=0.0 beamXp=$Xp beamYp=$Yp
 #reference referenceMomentum=$p particle=mu+ beamX=0.0 beamY=0.0 beamZ=0.0 beamXp=0.0 beamYp=0.0
 
-trace nTrace=1 format=ascii oneNTuple=0
+trace nTrace=0 format=ascii oneNTuple=1 filename=$outdir/AllTracks.txt
 
 ### DETECTORS ###
 
-include /Users/rithika/utkcms/hfofo/simplified-hfofo/detectors.txt
-#### try using a variable for this instead
+include $abspath/detectors.txt
+
 ### SOLENOIDS ###
 
-coil coil innerRadius=420 outerRadius=600 length=300 nSheets=10 maxR=360 maxZ=6000 dR=15 dZ=15 tolerance=0.003 
+coil coil innerRadius=420 outerRadius=600 length=300 nSheets=10 maxR=360 maxZ=6000 dR=15 dZ=15 tolerance=0.003 filename=$outdir/coil.dat 
 
 solenoid SolPos coilName=coil current=-$sol_current color=0,1,1
 solenoid SolNeg coilName=coil current=$sol_current color=0,1,0
 
-include /Users/rithika/utkcms/hfofo/simplified-hfofo/sol_place.txt
+include $abspath/sol_place.txt
 
 ### OTHER ###
 
-include /Users/rithika/utkcms/hfofo/simplified-hfofo/abs_place.txt
+include $abspath/abs_place.txt
 
 # Visualize magnetic field lines:
 #fieldlines center=0,0,0

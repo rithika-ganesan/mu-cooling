@@ -1,4 +1,4 @@
-# For a number of tracks in a folder, plot Br from x, y, z, Bz
+# Plot Br vs z, Bz vs z for the reference particle
 # Rithika Ganesan | May 2025
 
 import pandas as pd
@@ -9,9 +9,8 @@ import numpy as np
 
 ######## Get filepaths ##########
 directory = '/Users/rithika/utkcms/hfofo/'
-path_format = 'flipped/Ev*Trk*.txt'
-dir_path = directory + path_format
-files = sorted(glob.glob(dir_path))
+path_format = 'flipped/output/AllTracks.txt'
+file_path = directory + path_format
 
 ######## Parameters #############
 tuple_labels_noEM=["x", "y", "z", "Px", "Py", "Pz", "t", "PDGid", "EventID", "TrackID", "ParentID", "Weight"]
@@ -92,32 +91,64 @@ def get_br(df):
 plot_dir_path = directory + "/plots/" + "br"
 os.makedirs(plot_dir_path, exist_ok=True)
 
+df = read_ascii(file_path)
+print("Length of file before dropping copies:", len(df))
+
+df, indices = drop_copies(df)
+print("Length of file after dropping copies:", len(df))
+
+df = df[df["EventID"] == -1]
+df = df.reset_index()
+print("Length of file after getting only ref particle:", len(df))
+
+z, Bz = df['z'], df['Bz']
+z_, Br = get_br(df)
+eventid = df['EventID'].iloc[0]
+
+fig, axs = plt.subplots(2, 1, figsize=(8, 6))
+
+axs[0].plot(z, Bz, color='k', linewidth=1)
+axs[0].scatter(z, Bz, s=3, color='red')
+axs[0].set_xlabel('z (mm)')
+axs[0].set_ylabel('$B_z$ (T)')
+axs[0].set_title(f'$B_z$ vs. z')
+ 
+axs[1].plot(z_, Br, color='k', linewidth=1)
+axs[1].scatter(z_, Br, s=3, color='blue')
+axs[1].set_xlabel('z (mm)')
+axs[1].set_ylabel('$B_r$ (T)')
+axs[1].set_title(f'$B_r$ vs. z')
+ 
+plt.tight_layout()
+plt.savefig('../plots/flipped.png', dpi=300)
+plt.show()
+
 # Okay to loop as long as there are 20 or fewer files
-for i, file in enumerate(files):
-    df = read_ascii(file)
-    z, Bz = df['z'], df['Bz']
-    df, indices = drop_copies(df)
-    z_, Br = get_br(df)
-    eventid = df['EventID'][0]
-
-    fig, axs = plt.subplots(2, 1, figsize=(8, 6))
-   
-    axs[0].plot(z, Bz, color='k', linewidth=1)
-    axs[0].scatter(z, Bz, s=3, color='red')
-    axs[0].set_xlabel('z (mm)')
-    axs[0].set_ylabel('$B_z$ (T)')
-    axs[0].set_title(f'$B_r$')
-
-    axs[1].plot(z_, Br, color='k', linewidth=1)
-    axs[1].scatter(z_, Br, s=3, color='blue')
-    axs[1].set_xlabel('z (mm)')
-    axs[1].set_ylabel('$B_r$ (T)')
-    axs[1].set_title(f'$B_r$ vs. z (Event {eventid})')
-
-    plt.tight_layout()
-    plt.savefig(f'{plot_dir_path}/br_bz_{i}.png')
-
-    plt.show()
+# for i, file in enumerate(files):
+#     df = read_ascii(file)
+#     z, Bz = df['z'], df['Bz']
+#     df, indices = drop_copies(df)
+#     z_, Br = get_br(df)
+#     eventid = df['EventID'][0]
+# 
+#     fig, axs = plt.subplots(2, 1, figsize=(8, 6))
+#    
+#     axs[0].plot(z, Bz, color='k', linewidth=1)
+#     axs[0].scatter(z, Bz, s=3, color='red')
+#     axs[0].set_xlabel('z (mm)')
+#     axs[0].set_ylabel('$B_z$ (T)')
+#     axs[0].set_title(f'$B_r$')
+# 
+#     axs[1].plot(z_, Br, color='k', linewidth=1)
+#     axs[1].scatter(z_, Br, s=3, color='blue')
+#     axs[1].set_xlabel('z (mm)')
+#     axs[1].set_ylabel('$B_r$ (T)')
+#     axs[1].set_title(f'$B_r$ vs. z (Event {eventid})')
+# 
+#     plt.tight_layout()
+#     plt.savefig(f'{plot_dir_path}/br_bz_{i}.png')
+# 
+#     plt.show()
 
 
 
