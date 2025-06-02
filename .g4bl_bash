@@ -1,0 +1,19 @@
+#!/bin/bash
+
+main_directory="~/utkcms/hfofo" 		# project directory
+channel_directory="~/utkcms/hfofo/channels"     # directory containing different channel designs
+input_template=".input.in"
+
+# Usage: mkchannel single-solenoid
+# Creates a directory "single-solenoid" in channels with three sub-directories
+mkchannel() {
+	mkdir $channel_directory$1
+	cd $channel_directory$1
+	mkdir src output plots
+}
+
+# Usage: mkinput single-solenoid notilt.in
+# Creates a copy of template from input_template as notilt.in
+mkinput() {
+	cp $main_directory/$input_template $channel_directory/$1/$2
+}

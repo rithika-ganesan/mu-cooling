@@ -1,0 +1,7 @@
+ - look at relation between dispersion
+ - also look at x and y individually when a tilt is added
+ - for a second coil, flip polatity to see if you can cancel out angular momentum
+ - see if dispersion exists even when angular momentum is cancelled out
+ - ideally dispersion and angular momentum should be decoupled
+ - look at pz from B_r -> lorentz force along z
+ - dp_r / dt = dp_r / dz times dz / dt = v_z tmes 
