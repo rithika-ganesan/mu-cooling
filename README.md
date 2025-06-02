@@ -15,6 +15,20 @@ g4beamline [documentation](https://www.muonsinc.com/Website1/Muons/G4beamlineUse
 [A High-Performance Rectilinear FOFO Channel for Muon Cooling](http://accelconf.web.cern.ch/PAC2013/papers/thpho12.pdf)  
 [Solenoidal ionization cooling lattices](https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.10.064001)
 
+### Resources
+
+- USPAS lectures
+- Mini lecture series from Katsuya
+- Wiedemann
+- Book 2
+- Book 3
+
+### This directory
+
+**Bash commands**
+
+.g4bl_bash has custom commands to make working with g4beamline and multiple design channels easier. Run `source .g4bl_bash`.
+
 
 
 <!--- 
