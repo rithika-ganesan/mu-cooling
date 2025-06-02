@@ -1,7 +1,7 @@
 #!/bin/bash
 
-main_directory="~/utkcms/hfofo" 		# project directory
-channel_directory="~/utkcms/hfofo/channels"     # directory containing different channel designs
+main_directory="/Users/rithika/utkcms/mu-cooling" 	# project directory
+channel_directory="$main_directory/channels/"     # directory containing different channel designs
 input_template=".input.in"
 
 # Usage: mkchannel single-solenoid
@@ -15,5 +15,7 @@ mkchannel() {
 # Usage: mkinput single-solenoid notilt.in
 # Creates a copy of template from input_template as notilt.in
 mkinput() {
-	cp $main_directory/$input_template $channel_directory/$1/$2
+	cp $main_directory/$input_template $channel_directory/$1/src/$2
 }
+
+alias wd="cd $main_directory"
