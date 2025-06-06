@@ -1,3 +1,27 @@
+### Jun 05, 2025 | Thursday | Meeting with HFOFO folks
+
+- no analytical formula -> according to diktys and someone at bnl
+- paper -> appendix
+
+
+### Jun 04, 2025 | Wednesday | Meeting with HFOFO folks
+
+- dispersion vs angle plot
+- dispersion when there is offset in x and offset in y
+- magnetic field as a function of r? x axis = root (x^2 + y^2)
+- mathieu equation cannot be used outside of the condition
+- lorentz force components plots 
+- finding maximum condition for the 
+
+### Jun 03, 2025 | Tuesday | Meeting with HFOFO folks
+
+- caroline did something that I wanted to do: run g4bbeamline and extract the focusing length for a bunch of different configuration and see if i can find conditions for the thin lens analysis to be valid
+- when you use the randomseed the cancellation of angular momentum changes because it depends on the initial conditions
+- canonical ang mom is used for beta function calculations but mechanical angular momentum is enough to think about the channel design etc. using the canonical ang mom ensures that when we compare channels we look at them in 
+roughly the same way
+- cern experiment using polarized muon?
+- from yesterday's lecture: since muons and electrons have much weaker g factors? than protons, when they pass through the channel, they retain much of their polarization
+
 ### Jun 02, 2025 | Monday | Meeting with Katsuya and Caroline
 
 - look at relation between dispersion

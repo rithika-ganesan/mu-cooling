@@ -15,7 +15,17 @@ mkchannel() {
 # Usage: mkinput single-solenoid notilt.in
 # Creates a copy of template from input_template as notilt.in
 mkinput() {
-	cp $main_directory/$input_template $channel_directory/$1/src/$2
+	local dirname=$1
+	local inputname=$2
+	local paramtochange=channelname
+
+	cp $main_directory/$input_template $channel_directory/$dirname/src/$inputname.in
+
+	cd $channel_directory/$dirname/src
+	
+	sed -i '' "/param $paramtochange=/c\\
+param $paramtochange=$inputname
+	" $inputname.in
 }
 
 alias wd="cd $main_directory"

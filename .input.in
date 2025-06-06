@@ -1,95 +1,95 @@
-########### output ###########
-
-param outdir=../output
-
 ########## physics ###########
 
 physics QGSP_BIC doStochastics=0
 
-param part=mu+ # particle
-param nbeamevents=100 # number of beam events
-
-# constants
-param m=105.7 # muon mass in MeV
-param c=2.997925*10^8 # speed of light in m/s
-param pi=3.1415926 #pi
-
-param to_degrees=180/$pi
-param to_radians=$pi/180
-
 ########### params ###########
 
+# main:
+param part=mu+
+param nbeamevents=100
+
+# directory stuff:
+param channelname=template
+param outdir=../output
+
+# constants:
+param pi=3.141592654 # pi
+param c=2.997925*10^8 # speed of light in m/s
+param m=105.7 # muon mass in MeV
+
+param todegrees=180/$pi 
+param toradian=$pi/180
+
 # reference particle:
-param dp=0 #MeV/c -> displacement 
+param dp=0 #MeV/c -> displacement
 param p=200+$dp #MeV/c
 param v=$p*$c/sqrt($p^2+($m*$c)^2)
-
-# solenoid:
-param sol_ir=400.0 		# solenoid inner radius in mm
-param sol_t=100.0 		# solenoid thickness in mm
-param sol_or=$sol_ir+$sol_t 	# solenoid outer radius in mm
-param sol_len=400.0 		# solenoid length in mm
-param sol_current=100.0 	# solenoid current in amps/mm^2
-param sol_pitch=0.0 		# solenoid pitch in degrees
-param period_len=1000.0 	#mm
 
 # beam:
 param dx=0 #mm
 param dy=0 #mm
 param dxp=0 #radians
 param dyp=0 #radians
-
+ 
 param X=0 # beam location in X mm
 param Y=0 # beam location in Y mm
 param Xp=0 #radians
 param Yp=0 #radians
 
+# solenoid:
+
+param solInner=400.0 			#mm
+param solThickness=100.0 		#mm
+param solOuter=$solInner+$solThickness 	#mm
+param solLength=400.0 			#mm
+param solCurrent=100.0			#amps/mm^2
+param solPitch=0.0			#mm
+param period=1000.0			#mm
+param tiltx=0.0				#degs
+param tilty=0.0				#degs
+param tiltz=0.0				#degs
+
 ###### define elements #######
 
 # beam:
+
 beam gaussian particle=$part \ 
-	meanMomentum=$p \
 	nEvents=$nbeamevents \
-	beamZ=0.0 \			# beam location in Z (mm)
-	beamX=$X beamY=$Y \		# beam location in X and Y resp. (mm)
-	beamXp=$Xp beamYp=$Yp \		# beam mean in X and Y (slope)
-	sigmaX=10.0 sigmaY=10.0 \	# beam sigma in X and Y (mm)
-	sigmaXp=0.1 sigmaYp=0.1 \	# beam sigma in dxdx and dydz resp. (slope)
-	sigmaP=0.0 \			# beam sigma in momentum p
-	meanT=0.0 sigmaT=1.0		# beam mean/sigma in time t  
+	beamZ=0 \
+	beamX=$X beamY=$Y \
+	beamXp=$Xp beamYp=$Yp \ 
+	sigmaX=10.0 sigmaY=10.0 \ 
+	sigmaXp=0.1 sigmaYp=0.1 \
+	meanMomentum=$p sigmaP=0.0 \ 
+	meanT=0.0 sigmaT=1.0
+
+trackcuts killSecondaries=1
 
 # reference particle:
-reference particle=$part \
-	referenceMomentum=$p \
-	beamZ=0.0 \
-	beamX=$X beamY=$Y \ 
-	beamXp=$Xp beamYp=$Yp
 
-# detectors:
+reference particle=$part \
+	beamX=$X beamY=$Y \
+	beamZ=0 \
+	beamXp=0 beamYp=0 \
+	referenceMomentum=$p
+
+particlecolor reference=1,1,1
 
 # solenoids:
-coil coil innerRadius=$sol_ir outerRadius=$sol_or length=$sol_len \
-	tolerance=0.0 \ #non-zero sometimes
-	filename=.coil.dat #hide coil file
 
-solenoid SolPos coilName=coil current=$sol_current color=1,0,0
-solenoid SolNeg coilName=coil current=-$sol_current color=0,0,1
+coil Coil1 innerRadius=$solInner outerRadius=$solOuter \
+	 length=$solLength \
+	 maxR=5000 maxZ=10000
+
+solenoid SolPos coilName=Coil1 current=$solCurrent color=1,0,0
+solenoid SolNeg coilName=Coil1 current=-$solCurrent color=0,0,1
 
 ####### place elements #######
 
+place SolPos x=0 y=0 z=0
 
-
-
-
-# visualize magnetic field lines:
+# vis:
 fieldlines center=0,0,0
 
 # trace:
-# set nTrace non-zero to track particles other than reference/tune
-# set oneNTuple=0 for individual file for each particle
-trace nTrace=0 format=ascii oneNTuple=1 filename=$outdir/trace.txt
-
-
-
-
-
+trace format=ascii nTrace=0 oneNTuple=1 filename=$outdir/trace_$channelname.txt 
