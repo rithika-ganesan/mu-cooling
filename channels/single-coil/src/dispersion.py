@@ -7,11 +7,10 @@
 ########## settings ##########
 
 inp = "singlecoil"
-running_from = "channel src"  
 filenametype = "trace_*.txt"
 #use_channel = None
-use_channel = "nodet-deltap0p1-xoffset0"
-
+#use_channel = "deltap0p1-xoffset20"
+use_channel = 'detectortest'
 ######## dependencies ########
 
 import pandas as pd
@@ -304,6 +303,26 @@ for channel in channels:
             plt.savefig(f'../plots/{desc}.png', dpi=300)
         if show == 1:
             plt.show()
+    
+    #==== ref particle, test particle x vs z ====
+    plotxvzrefptestp = 0
+    show, save = 1, 0
+    #save, show = 1, 0   ##### COMMENT TO SHOW, UNCOMMENT TO SAVE
+    if plotxvzrefptestp == 1:
+        desc=f'xvz-refptestp-{channel}'
+        fig = plt.figure(figsize=(8, 6))
+        plt.plot(rz, rx, linewidth=1, label='Reference particle')
+        plt.plot(tz, tx, linewidth=1, label='Test particle')
+        plt.xlabel('z (mm)')
+        #plt.xlim([-2, 5])
+        plt.ylabel('x (mm)')
+        plt.legend()
+        plt.title(f'x vs. z -- {channel}')
+        plt.tight_layout()
+        if save == 1:
+            plt.savefig(f'../plots/{desc}.png', dpi=300)
+        if show == 1:
+            plt.show()
 
     #==== ref particle, test particle x vs z ====
     plotyvzrefptestp = 0
@@ -445,7 +464,7 @@ for channel in channels:
             #plt.clf()
 
     #==== ref particle Bx By Bz vs z ====
-    plot_bxbybz_v_z = 1
+    plot_bxbybz_v_z = 0
     show, save = 1, 0
     #show, save = 0, 1   ##### COMMENT TO SHOW, UNCOMMENT TO SAVE
     if plot_bxbybz_v_z == 1:
@@ -473,27 +492,24 @@ for channel in channels:
             plt.show()
     
     #==== ref Bx By vs x y | transverse plane ====
-    plot_bxby_transverse = 1
+    plot_bxby_transverse = 0
     show, save = 1, 0
     #show, save = 0, 1   ##### COMMENT TO SHOW, UNCOMMENT TO SAVE
-    if plot_bxbybz_v_z == 1:
-        desc=f'bxbybz-v-z_{channel}'
+    if plot_bxby_transverse == 1:
+        desc=f'bxby_{channel}'
 
         fig = plt.figure(figsize=(8, 6))
 
         z = refp['z']
         bx, by, bz = refp['Bx'], refp['By'], refp['Bz']
     
-        print(max(bz)) 
-
-        plt.plot(z, bx, linewidth=1, label='$B_x$')
-        plt.plot(z, by, linewidth=1, label='$B_y$')
-        plt.plot(z, bz, linewidth=1, label='$B_z$')
-        plt.xlabel('z (mm)')
+        step = 150
+        plt.scatter(bx[:step], by[:step], s=5, label='Reference')
+        plt.xlabel('Bx (T)')
         #plt.xlim([-2, 5])
-        plt.ylabel('B (T)')
+        plt.ylabel('By (T)')
         plt.legend()
-        plt.title(f'B vs. z -- {channel}')
+        plt.title(f'Bx vs. By -- {channel}')
         plt.tight_layout()
         if save == 1:
             plt.savefig(f'../plots/{desc}.png', dpi=300)
@@ -508,7 +524,7 @@ for channel in channels:
 
     #==== s vs z ====
     plot_svz = 0
-    show, save = 1, 1
+    show, save = 1, 0
     #save, show = 1, 0   ##### COMMENT TO SHOW, UNCOMMENT TO SAVE
     if plot_svz == 1:
         desc=f'svz_{channel}'
@@ -552,10 +568,10 @@ for channel in channels:
             plt.show()
 
     #==== plot dispersion ====
-    plottotaldispersion = 0
+    plottotaldispersion = 1
     plot_ = 1
     scatter_ = 1
-    show, save = 1, 1
+    show, save = 1, 0
     #show, save = 0, 1   ##### COMMENT TO SHOW, UNCOMMENT TO SAVE
     if plottotaldispersion == 1:
         desc=f'totaldispersion-{channel}'
@@ -567,7 +583,7 @@ for channel in channels:
             plt.scatter(rz, disp, s=3)
         plt.xlabel('z (mm)')
         plt.ylabel('Dispersion (mm)')
-        plt.title(f'Total dispersion vs z -- {channel}')
+        #plt.title(f'Total dispersion vs z -- {channel}')
         plt.tight_layout()
         if save == 1:
             plt.savefig(f'../plots/{desc}.png', dpi=300)

@@ -1,0 +1,107 @@
+########## physics ###########
+
+physics QGSP_BIC doStochastics=0
+
+########### params ###########
+
+# main:
+param part=mu+
+param nbeamevents=100
+
+# directory stuff:
+param channelname=detectortest-noc
+param outdir=../output
+
+# constants:
+param pi=3.141592654 # pi
+param c=2.997925*10^8 # speed of light in m/s
+param m=105.7 # muon mass in MeV
+
+param todegrees=180/$pi 
+param toradian=$pi/180
+
+# reference particle:
+param dp=0.1 #MeV/c -> displacement
+param p=200 #MeV/c
+param v=$p*$c/sqrt($p^2+($m*$c)^2)
+
+# beam:
+param dx=0 #mm
+param dy=0 #mm
+param dxp=0 #radians
+param dyp=0 #radians
+ 
+param X=20 # beam location in X mm
+param Y=0 # beam location in Y mm
+param Xp=0 #radians
+param Yp=0 #radians
+
+# solenoid:
+
+param solInner=400.0 			#mm
+param solThickness=100.0 		#mm
+param solOuter=$solInner+$solThickness 	#mm
+param solLength=400.0 			#mm
+param solCurrent=100.0			#amps/mm^2
+param solPitch=0.0			#mm
+param period=1000.0			#mm
+param tiltx=0
+param tilty=0.0				#degs
+param tiltz=0.0				#degs
+
+########### trace ############
+
+trace format=ascii nTrace=1 oneNTuple=1 filename=$outdir/trace_$channelname.txt 
+
+###### define elements #######
+
+# beam:
+
+beam gaussian particle=$part \ 
+	nEvents=$nbeamevents \
+	beamZ=-5000.0 \
+	beamX=$X beamY=$Y \
+	beamXp=$Xp beamYp=$Yp \ 
+	sigmaX=0.0 sigmaY=0.0 \ 
+	sigmaXp=0.0 sigmaYp=0.0 \
+	meanMomentum=$p+$dp sigmaP=0.0 \ 
+	meanT=0.0 sigmaT=1.0
+
+trackcuts killSecondaries=1
+
+# reference particle:
+
+reference particle=$part \
+	beamX=20 beamY=$Y \
+	beamZ=-5000.0 \
+	beamXp=0 beamYp=0 \
+	referenceMomentum=$p
+
+particlecolor reference=1,1,1
+
+# solenoids:
+
+coil Coil1 innerRadius=$solInner outerRadius=$solOuter \
+	 length=$solLength \
+	 maxR=5000 maxZ=10000
+
+solenoid SolPos coilName=Coil1 current=$solCurrent color=1,0,0
+solenoid SolNeg coilName=Coil1 current=-$solCurrent color=0,0,1
+
+# detectors:
+
+virtualdetector det radius=300 length=0.001 color='' format=ascii
+
+####### place elements #######
+
+place SolPos x=0 y=0 z=0 rotation=X$tiltx,Y$tilty,Z$tiltz
+
+place det x=0 y=0 z=-10*$period color=0,1,0
+place det x=0 y=0 z=-5*$period color=0,1,0
+#place det x=0 y=0 z=0 color=0,1,0
+place det x=0 y=0 z=5*$period color=0,1,0
+place det x=0 y=0 z=10*$period color=0,1,0
+
+# vis:
+fieldlines center=0,0,0 nLines=100 
+

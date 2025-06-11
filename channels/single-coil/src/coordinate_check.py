@@ -42,9 +42,46 @@ def position_vector(x, y):
 # plt.xlim([-1, 1])
 # plt.ylim([-1, 1])
 # plt.show()
-plotswitch = 1
+bfield = 1
 
-if plotswitch != 0:
+if bfield != 0:
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))  # Two subplots side by side
+
+    # First subplot (your original plot goes here)
+    ax1.scatter(x, y)
+    ax1.axvline(0, c='k', lw=0.25)
+    ax1.axhline(0, c='k', lw=0.25)
+
+    for i in range(len(x)):
+        xc, yc = position_vector(x[i], y[i])
+        ax1.plot(xc, yc, lw=0.5, c='blue')
+
+    ax1.set_xlim([-1, 1])
+    ax1.set_ylim([-1, 1])
+    ax1.set_xlabel('X-axis')
+    ax1.set_ylabel('Y-axis')
+    ax1.set_title("Original position vectors")
+
+    # Second subplot (empty for now or add your content here)
+    ax2.scatter(xr, yr)
+    ax2.axvline(0, c='k', lw=0.25)
+    ax2.axhline(0, c='k', lw=0.25)
+
+    for i in range(len(x)):
+        xc, yc = position_vector(xr[i], yr[i])
+        ax2.plot(xc, yc, lw=0.5, c='blue')
+
+    ax2.set_xlim([-1, 1])
+    ax2.set_ylim([-1, 1])
+    ax2.set_title("Polar coordinate vectors")
+
+    plt.tight_layout()
+    plt.show()
+
+
+transform = 0
+
+if transform != 0:
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))  # Two subplots side by side
 
     # First subplot (your original plot goes here)
