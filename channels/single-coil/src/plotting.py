@@ -7,7 +7,7 @@
 ########## Settings ##########
 
 input_file = "singlecoil"        #name of the g4bl input file
-use_channel = ["nodet-dp0p1-xoffset020"]          #name of single channel
+use_channel = ["nodet-xoffset020"]          #name of single channel
 #use_channel = None
 
 # switch, save, show
@@ -27,7 +27,10 @@ plot_options = {
     'transverse plane r and B': [0, 0, 1],
     'ref test comparison': [0, 1, 1],
     'rB vs. r': [0, 0, 1],
-    'rB vs. z': [1, 1, 1]
+    'rB vs. z': [0, 1, 1],
+    'tof vs. z': [1, 0, 1],
+    'step size check': [0, 0, 1],
+    'tof vs. z g4 formula': [1, 0, 1]
 }
 
 multiplot_options = {
@@ -175,10 +178,10 @@ for channel in channels:
     df = df[df["EventID"] == -1]
     #ref = df[df["EventID"] == -1]
     #test = df[df["EventID"] == 1]
-    lbl = channel_labels[channel]
+#    lbl = channel_labels[channel]
     #lbl = "Reference particle, no offsets"
     
-
+    print(channel)
     #=============== x vs. z ================
     switch, save, show = plot_options['x vs. z']
     if switch == 1:
@@ -256,13 +259,13 @@ for channel in channels:
         plt.axvline(edges[0], ls='--', lw=0.5, c='k')
         plt.axvline(edges[1], ls='--', lw=0.5, c='k', label='Solenoid edges')
         plt.plot(df['z'], df['Pz'], lw=1, label=f'{labels["Pz"]}')
-        plt.scatter(df['z'], df['Pz'], s=5, c='k')        
+        #plt.scatter(df['z'], df['Pz'], s=5, c='k')        
         plt.legend()
         plt.xlabel('z (mm)')
         plt.ylabel('$p_z$ (MeV/c)')
         plt.tight_layout()
         if save == 1:
-            plt.savefig(f'../plots/{channel}_pz-vs-z.png', dpi=300)
+            plt.savefig(f'../plots/{channel}_pz-vs-z-noscatter.png', dpi=300)
         if show == 1:
             plt.show()
     
@@ -499,7 +502,7 @@ for channel in channels:
     #=============== rB vs. z  ================
     switch, save, show = plot_options['rB vs. z']
     if switch == 1:
-        plt.figure(figsize=(8, 6))
+        plt.figure(figsize=(10, 4))
         plt.title(f'$r_B$ vs. z -- {lbl}')
        
         #df = df[df['z'] < 1000]
@@ -525,7 +528,7 @@ for channel in channels:
         plt.ylabel('$r_B$')
         plt.tight_layout()
         if save == 1:
-            plt.savefig(f'../plots/{channel}_rB-vs-z.png', dpi=300)
+            plt.savefig(f'../plots/{channel}_rB-vs-z-fin.png', dpi=300)
         if show == 1:
             plt.show()
     
@@ -544,6 +547,99 @@ for channel in channels:
 #print(len(a), len(b))
 #b = np.append(b, np.array([0,0,0]))
 
+    #================= time of flight ===============
+    if plot_options['tof vs. z'][0] == 1:
+        t, z, pz = df['t'], df['z'], df['Pz'] 
+        dt = []
+        for i in range(len(df) - 1):
+            delt = t.iloc[i+1] - t.iloc[i]
+            dt.append(delt)
+       
+        #print(z.iloc[0], z.iloc[-1])
+
+        plt.plot(z, pz)
+        plt.ylim([199.5, 200])
+        plt.show()
+
+        dt = np.array(dt)
+        plt.figure(figsize=(10, 5))
+        plt.plot(z[1:-1], dt[:-1], lw=0.5)
+        #plt.scatter(z[1:], dt, marker='.', s=1)
+        plt.title('Time difference between steps -- maxStep=100mm, no offsets')
+        plt.xlabel('z (mm)')
+        plt.ylabel('$\Delta t$ (ns)')
+        #plt.ylim([0.01875, 0.019])
+        plt.tight_layout()
+        #plt.savefig(f'../plots/coarse-nooffsets-tof-vs-z.png', dpi=300)
+        plt.show()
+    
+    #================= check step size  ===============
+    if plot_options['step size check'][0] == 1:
+        t, z, pz = df['t'], df['z'], df['Pz'] 
+        
+        dz = []
+        dt = []
+
+        for i in range(len(df) - 1):
+            delt = t.iloc[i+1] - t.iloc[i]
+            dt.append(delt)
+            delz = z.iloc[i+1] - z.iloc[i]
+            dz.append(delz)
+
+        #print(z.iloc[0], z.iloc[-1])
+
+        dz, dt = np.array(dz), np.array(dt)
+
+        dz, dt = dz[:-1], dt[:-1]
+    
+        plt.hist(dt, bins=100)
+        plt.xlabel('Time differences (ns)')
+        plt.tight_layout()
+        plt.savefig("../plots/deltat-nooffsets-100mm.png", dpi=300)
+        plt.show()
+
+        plt.hist(dz, bins=100)
+        plt.xlabel('z differences (mm)')
+        plt.tight_layout()
+        plt.savefig("../plots/deltaz-nooffsets-100mm.png", dpi=300)
+        #plt.show()
+    
+    #================= tof g4  ===============
+    if plot_options['tof vs. z g4 formula'][0] == 1:
+        t, z, pz = df['t'], df['z'], df['Pz'] 
+        m = 105.658367 #MeV/c
+        c = 2.99792458e+8 * 1000 ##mm / s
+        betaz = pz / np.sqrt(m**2 + pz**2)
+        vz = betaz * c
+
+        dz = []
+        dt = []
+        v1 = []
+        v2 = []
+
+        for i in range(len(df) - 1):
+            delt = t.iloc[i+1] - t.iloc[i]
+            dt.append(delt)
+            delz = z.iloc[i+1] - z.iloc[i]
+            dz.append(delz)
+            v2.append(vz.iloc[i+1])
+            v1.append(vz.iloc[i])
+
+        dz, dt = np.array(dz), np.array(dt)
+        v1, v2 = np.array(v1), np.array(v2)
+        dz, dt = dz[:-1], dt[:-1]
+        v1, v2 = v1[:-1], v2[:-1]
+        z = np.array(z)
+
+        
+
+        deltatcalc = 0.5 * dz * ((1 / v1) + (1 / v2))
+
+        print(len(deltatcalc))
+
+        plt.scatter(z[1:-1], deltatcalc, s=5)
+        plt.tight_layout()
+        plt.show()
 
 #z_values = pd.DataFrame({'Det': a, 'No Det': b})
 #z_values.to_csv('../output/zvals_test.csv', index=False)  # index=False omits row numbers

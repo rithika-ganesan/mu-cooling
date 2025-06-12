@@ -1,6 +1,7 @@
 ########## physics ###########
 
 physics QGSP_BIC doStochastics=0
+randomseed time
 
 ########### params ###########
 
@@ -8,8 +9,10 @@ physics QGSP_BIC doStochastics=0
 param part=mu+
 param nbeamevents=100
 
+param maxStep=5.0
+
 # directory stuff:
-param channelname=nodet-maxZ5000-xoffset020
+param channelname=no-offset
 param outdir=../output
 
 # constants:
@@ -31,7 +34,7 @@ param dy=0 #mm
 param dxp=0 #radians
 param dyp=0 #radians
  
-param X=20 # beam location in X mm
+param X=0 # beam location in X mm
 param Y=0 # beam location in Y mm
 param Xp=0 #radians
 param Yp=0 #radians

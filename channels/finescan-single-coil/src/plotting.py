@@ -7,8 +7,13 @@
 ########## Settings ##########
 
 input_file = "singlecoil"        #name of the g4bl input file
-use_channel = ["nodet-dp0p1-xoffset020"]          #name of single channel
+use_channel = ["xoffset20"]          #name of single channel
 #use_channel = None
+
+import warnings
+
+# Globally ignore SyntaxWarning
+warnings.filterwarnings("ignore", category=SyntaxWarning)
 
 # switch, save, show
 plot_options = {
@@ -16,18 +21,31 @@ plot_options = {
     'y vs. z': [0, 1, 1],
     'p vs. x': [0, 1, 1],
     'pz vs. z': [0, 1, 1],
-    'px py vs. z': [0, 0, 1],
+    'px py vs. z': [0, 1, 1],
     'px+py vs. z': [0, 1, 1],
     'px py pz vs. z': [0, 1, 1],
     'ptsquared vs. z': [0, 1, 1],
-    'psquared vs. z': [0, 1, 1],
+    'psquared vs. z': [1, 1, 1],
+    'p vs. z': [0, 1, 0],
     'Bx By vs. z': [0, 1, 1],
-    'Bx By Bz vs. z': [0, 0, 1],
+    'Bx By Bz vs. z': [0, 1, 1],
     'phi_r vs. phi_B': [0, 0, 1],
     'transverse plane r and B': [0, 0, 1],
-    'ref test comparison': [0, 1, 1],
+    'ref test comparison': [0, 0, 1],
     'rB vs. r': [0, 0, 1],
-    'rB vs. z': [1, 1, 1]
+    'rB vs. z': [0, 1, 1],
+    'Lz vs. z': [0, 1, 1]
+}
+
+analysis_options = {
+    'phase advance': 0,
+    'net phase': 0,
+    'numbers': 0,
+    'write clean output': 0,
+    'tof -- full length': 0,
+    'tof -- pz': 0,
+    't vs. z': 0,
+    'tof vs. z': 0
 }
 
 multiplot_options = {
@@ -38,11 +56,13 @@ multiplot_options = {
 }
 
 channel_labels = {
+    "xoffset20": "Beam at X=20mm, Y=0mm",
     "deltap0": "$\delta p = 0.0$",
     "nodet-xoffset000": "No detectors, beam at X=0mm, Y=0mm",
     "nodet-xoffset020": "No detectors, beam at X=+20mm, Y=0mm",
     "nodet-dp0p1-xoffset020": "No detectors, beam at X=+20mm, Y=0mm, and $\delta p = 0.1$",
-    "det-dp0p1-xoffset020": "Detectors at 5000mm intervals, beam at X=+20mm, Y=0mm, and $\delta p = 0.1$" 
+    "det-dp0p1-xoffset020": "Detectors at 5000mm intervals, beam at X=+20mm, Y=0mm, and $\delta p = 0.1$",
+    "no-offset": "No offsets"
 }
 
 ######## Dependencies ########
@@ -175,7 +195,7 @@ for channel in channels:
     df = df[df["EventID"] == -1]
     #ref = df[df["EventID"] == -1]
     #test = df[df["EventID"] == 1]
-    lbl = channel_labels[channel]
+    lbl = channel_labels["xoffset20"]
     #lbl = "Reference particle, no offsets"
     
 
@@ -184,7 +204,7 @@ for channel in channels:
     if switch == 1:
         plt.figure(figsize=(8, 6))
         plt.title(f'x vs. z -- {lbl}')
-        plt.axvline(edges[0], ls='--', lw=0.5, c='k')
+        plt.axvline(edges[0], ls='--', lw=0.5, c='k', label='Solenoid edges')
         plt.axvline(edges[1], ls='--', lw=0.5, c='k')
         plt.plot(df['z'], df['x'])
         plt.xlabel('z (mm)')
@@ -201,7 +221,7 @@ for channel in channels:
     if switch == 1:
         plt.figure(figsize=(8, 6))
         plt.title(f'y vs. z -- {lbl}')
-        plt.axvline(edges[0], ls='--', lw=0.5, c='k')
+        plt.axvline(edges[0], ls='--', lw=0.5, c='k', label='Solenoid edges')
         plt.axvline(edges[1], ls='--', lw=0.5, c='k')
         plt.plot(df['z'], df['y'])
         plt.xlabel('z (mm)')
@@ -218,14 +238,14 @@ for channel in channels:
         fig, axs = plt.subplots(1, 3, figsize=(12, 6))
         
         x, y = 'x', 'Px'
-        axs[0].scatter(df[x], df[y])
+        axs[0].scatter(df[x], df[y], s=3)
         axs[0].plot(df[x], df[y], lw=1)
         axs[0].set_title(f'{labels[y]} vs. {labels[x]}')
         axs[0].set_xlabel(f'{labels[x]}')
         axs[0].set_ylabel(f'{labels[y]}')
 
         x, y = 'y', 'Py'
-        axs[1].scatter(df[x], df[y])
+        axs[1].scatter(df[x], df[y], s=3)
         axs[1].plot(df[x], df[y], lw=1)
         axs[1].set_title(f'{labels[y]} vs. {labels[x]}')
         axs[1].set_xlabel(f'{labels[x]}')
@@ -256,7 +276,7 @@ for channel in channels:
         plt.axvline(edges[0], ls='--', lw=0.5, c='k')
         plt.axvline(edges[1], ls='--', lw=0.5, c='k', label='Solenoid edges')
         plt.plot(df['z'], df['Pz'], lw=1, label=f'{labels["Pz"]}')
-        plt.scatter(df['z'], df['Pz'], s=5, c='k')        
+        #plt.scatter(df['z'], df['Pz'], s=5, c='k')        
         plt.legend()
         plt.xlabel('z (mm)')
         plt.ylabel('$p_z$ (MeV/c)')
@@ -318,7 +338,7 @@ for channel in channels:
     if switch == 1:
         plt.figure(figsize=(8, 6))
         plt.title(f'p vs. z -- {lbl}')
-        plt.axvline(edges[0], ls='--', lw=0.5, c='k')
+        plt.axvline(edges[0], ls='--', lw=0.5, c='k', label='Solenoid edges')
         plt.axvline(edges[1], ls='--', lw=0.5, c='k')
         plt.plot(df['z'], df['Px'], label=f'{labels["Px"]}')
         plt.plot(df['z'], df['Py'], label=f'{labels["Py"]}')
@@ -337,7 +357,7 @@ for channel in channels:
     if switch == 1:
         plt.figure(figsize=(10, 6))
         plt.title(f'$p_T^2$ vs. z -- {lbl}')
-        plt.axvline(edges[0], ls='--', lw=0.5, c='k')
+        plt.axvline(edges[0], ls='--', lw=0.5, c='k', label='Solenoid edges')
         plt.axvline(edges[1], ls='--', lw=0.5, c='k')
         #plt.axhline(40000.0, ls='--', lw=0.5, c='b') 
         #plt.axhline(40000.07857, ls='--', lw=0.5, c='b') 
@@ -356,21 +376,48 @@ for channel in channels:
     #=============== p^2 vs. z ================
     switch, save, show = plot_options['psquared vs. z']
     if switch == 1:
-        plt.figure(figsize=(10, 6))
+        plt.figure(figsize=(12, 8))
         plt.title(f'$p^2$ vs. z -- {lbl}')
-        plt.axvline(edges[0], ls='--', lw=0.5, c='k')
-        plt.axvline(edges[1], ls='--', lw=0.5, c='k')
-        plt.axhline(40000.0, ls='--', lw=0.5, c='b') 
-        plt.axhline(40000.07857, ls='--', lw=0.5, c='b') 
+        plt.axvline(edges[0], ls='--', lw=1, c='k', label='Solenoid edges')
+        plt.axvline(edges[1], ls='--', lw=1, c='k')
+        #plt.axhline(40000.0, ls='--', lw=0.5, c='b') 
+        #plt.axhline(40000.07857, ls='--', lw=0.5, c='b') 
         psquare = df['Px']**2 + df['Py']**2 + df['Pz']**2
-        print(np.array(psquare)[-50])
+        maxval = np.array(psquare)[-50]
+        print(maxval)
+        #plt.axhline(maxval, ls='--', lw=0.5, c='b') 
         plt.plot(df['z'], psquare, label='$p^2 = p_x^2 + p_y^2 + p_z^2$')
-        plt.legend()
+        plt.legend(loc='lower left')
+        plt.xlim([-1000, 1000])
         plt.xlabel('z (mm)')
         plt.ylabel('$p^2 (MeV^2/c^2)$')
         plt.tight_layout()
         if save == 1:
-            plt.savefig(f'../plots/{channel}_psquare-vs-z.png', dpi=300)
+            plt.savefig(f'../plots/{channel}_psquarezoom-vs-z.png', dpi=300)
+        if show == 1:
+            plt.show()
+    
+    #=============== p vs. z ================
+    switch, save, show = plot_options['p vs. z']
+    if switch == 1:
+        plt.figure(figsize=(10, 6))
+        plt.title(f'$p$ vs. z -- {lbl}')
+        plt.axvline(edges[0], ls='--', lw=0.5, c='k', label='Solenoid edges')
+        plt.axvline(edges[1], ls='--', lw=0.5, c='k')
+        plt.axhline(200.0, ls='--', lw=0.5, c='b') 
+        plt.axhline(200.00019642, ls='--', lw=0.5, c='b') 
+        plt.axhline(200.00021701, ls='--', lw=0.5, c='b') 
+        #plt.axhline(40000.0, ls='--', lw=0.5, c='b') 
+        #plt.axhline(40000.07857, ls='--', lw=0.5, c='b') 
+        p = (df['Px']**2 + df['Py']**2 + df['Pz']**2)**0.5
+        print(np.array(p)[-50])
+        plt.plot(df['z'], p, label='$p = (p_x^2 + p_y^2 + p_z^2)^{0.5}$')
+        plt.legend()
+        plt.xlabel('z (mm)')
+        plt.ylabel('$p (MeV/c)$')
+        plt.tight_layout()
+        if save == 1:
+            plt.savefig(f'../plots/{channel}_p-vs-z.png', dpi=300)
         if show == 1:
             plt.show()
     
@@ -379,7 +426,7 @@ for channel in channels:
     if switch == 1:
         plt.figure(figsize=(8, 6))
         plt.title(f'B vs. z -- {lbl}')
-        plt.axvline(edges[0], ls='--', lw=0.5, c='k')
+        plt.axvline(edges[0], ls='--', lw=0.5, c='k', label='Solenoid edges')
         plt.axvline(edges[1], ls='--', lw=0.5, c='k')
         plt.plot(df['z'], df['Bx'], label=f'{labels["Bx"]}')
         plt.plot(df['z'], df['By'], label=f'{labels["By"]}')
@@ -397,7 +444,7 @@ for channel in channels:
     if switch == 1:
         plt.figure(figsize=(8, 6))
         plt.title(f'B vs. z -- {lbl}')
-        plt.axvline(edges[0], ls='--', lw=0.5, c='k')
+        plt.axvline(edges[0], ls='--', lw=0.5, c='k', label='Solenoid edges')
         plt.axvline(edges[1], ls='--', lw=0.5, c='k')
         plt.plot(df['z'], df['Bx'], label=f'{labels["Bx"]}')
         plt.plot(df['z'], df['By'], label=f'{labels["By"]}')
@@ -499,7 +546,7 @@ for channel in channels:
     #=============== rB vs. z  ================
     switch, save, show = plot_options['rB vs. z']
     if switch == 1:
-        plt.figure(figsize=(8, 6))
+        plt.figure(figsize=(10, 4))
         plt.title(f'$r_B$ vs. z -- {lbl}')
        
         #df = df[df['z'] < 1000]
@@ -529,6 +576,28 @@ for channel in channels:
         if show == 1:
             plt.show()
     
+    #=============== Lz vs. z  ================
+    switch, save, show = plot_options['Lz vs. z']
+    if switch == 1:
+        plt.figure(figsize=(8, 6))
+        plt.title(f'$L_z$ vs. z -- {lbl}')
+       
+        x, y, px, py = df['x'], df['y'], df['Px'], df['Py']
+        z = df['z']
+
+        Lz = x * py - y * px
+
+        plt.plot(z, Lz, lw=1)
+        
+        plt.legend()
+        plt.xlabel('$z$')
+        plt.ylabel('$L_z$')
+        plt.tight_layout()
+        if save == 1:
+            plt.savefig(f'../plots/{channel}_Lz-vs-z.png', dpi=300)
+        if show == 1:
+            plt.show()
+    
     #=============== count tracks ================
     switch, save, show = plot_options['ref test comparison']
     if switch == 1:
@@ -547,6 +616,143 @@ for channel in channels:
 
 #z_values = pd.DataFrame({'Det': a, 'No Det': b})
 #z_values.to_csv('../output/zvals_test.csv', index=False)  # index=False omits row numbers
+
+##########################################################
+#                         Analysis                       #
+##########################################################
+
+    if analysis_options['net phase'] == 1:
+        z = df['z']
+        print(min(z), max(z))
+        x, y = df['x'], df['y']
+        Bz = df['Bz']
+
+        phi = np.array(np.arctan2(y, x))
+
+        ##### SITUATION SPECIFIC NOT A GLOBAL FORMULA
+        print(2*np.pi + np.abs(phi[-1]))
+
+        #plt.scatter(z, phi, s=1)
+        #plt.xlim([-5000, 10000])
+        #plt.xlabel('z (mm)')
+        #plt.show()
+
+    if analysis_options['phase advance'] == 1:
+        #e = 1.602176634e-19 #Coulombs
+        e = 1
+        m_mu = 105.7 #MeV/c^2
+        cofactor = e / (2 * m_mu)
+        c = 2.998e8 #m/s    
+
+        Bz = max(df['Bz'])
+        p = 200
+        
+        beta = p / np.sqrt(m_mu**2 + p**2)
+        gamma = 1 / np.sqrt(1 - beta**2)
+
+        print("Beta:", beta)
+
+        mu = cofactor * Bz / (gamma * beta)
+
+        print("Phase advance:", mu)
+
+    if analysis_options['numbers'] == 1:
+        z = np.array(df['z'])
+        z0 = z[0]
+
+        print(type(z0))
+
+
+    if analysis_options['write clean output'] == 1:
+        x, y = df['z'], df['Pz']
+        out_df = pd.DataFrame({'z': df['z'], 'pz': df['Pz']})
+        print(out_df.shape)
+        out_df.to_csv(f'../output/{channel}-z-pz.csv', header=False, index=False)
+
+    if analysis_options['tof -- full length'] == 1:
+        maxStep = 5.00 #mm -- L z
+        m = 105.7
+        c = 3e8
+        tof = []
+        x, y, z = df['x'], df['y'], df['z']
+        px, py, pz = df['Px'], df['Py'], df['Pz']
+        L = []
+
+        for i in range(len(df) - 1):
+            x2, y2, z2 = x.iloc[i+1], y.iloc[i+1], z.iloc[i+1]
+            x1, y1, z1 = x.iloc[i], y.iloc[i], z.iloc[i]
+            l = np.sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
+            L.append(l)
+
+            px2, py2, pz2 = px.iloc[i+1], py.iloc[i+1], pz.iloc[i+1]
+            px1, py1, pz1 = px.iloc[i], py.iloc[i], pz.iloc[i]
+
+            vx2, vy2 = px2 / m, py2 / m  
+            vx1, vy1 = px1 / m, py1 / m
+
+            bz2 = pz2 / np.sqrt(m**2 + pz2**2)
+            bz1 = pz1 / np.sqrt(m**2 + pz1**2)
+            vz2, vz1 = bz2 * c, bz1 * c
+
+            v2 = np.sqrt(vx2**2 + vy2**2 + vz2**2)
+            v1 = np.sqrt(vx1**2 + vy1**2 + vz1**2)
+            
+            tof.append(l * ((1/v1) - (1/v2)))
+
+        zz = z[1:]
+        plt.scatter(z[1:], tof, s=4)
+        plt.show()
+    
+    if analysis_options['tof -- pz'] == 1:
+        maxStep = 5.00 #mm -- L z
+        m = 105.7
+        c = 3e8
+        tof = []
+        x, y, z = df['x'], df['y'], df['z']
+        px, py, pz = df['Px'], df['Py'], df['Pz']
+        L = []
+
+        for i in range(len(df) - 1):
+
+            px2, py2, pz2 = px.iloc[i+1], py.iloc[i+1], pz.iloc[i+1]
+            px1, py1, pz1 = px.iloc[i], py.iloc[i], pz.iloc[i]
+
+            vx2, vy2 = px2 / m, py2 / m  
+            vx1, vy1 = px1 / m, py1 / m
+
+            bz2 = pz2 / np.sqrt(m**2 + pz2**2)
+            bz1 = pz1 / np.sqrt(m**2 + pz1**2)
+            vz2, vz1 = bz2 * c, bz1 * c
+
+            v2 = np.sqrt(vx2**2 + vy2**2 + vz2**2)
+            v1 = np.sqrt(vx1**2 + vy1**2 + vz1**2)
+            
+            tof.append(maxStep * ((1/v1) - (1/v2)))
+
+        zz = z[1:]
+        plt.scatter(z[1:], tof, s=4)
+        plt.show()
+
+    if analysis_options['t vs. z'] == 1:
+        t, z = df['t'], df['z']
+        plt.scatter(z, t, s=3)
+        plt.show()
+
+    if analysis_options['tof vs. z'] == 1:
+        t, z = df['t'], df['z']
+        dt = []
+        for i in range(len(df) - 1):
+            delt = t.iloc[i+1] - t.iloc[i]
+            dt.append(delt)
+
+        plt.figure(figsize=(10, 5))
+        plt.plot(z[1:], dt, lw=0.5)
+        #plt.scatter(z[1:], dt, marker='.', s=1)
+        plt.xlabel('z (mm)')
+        plt.ylabel('$\Delta t$ (ns)')
+        plt.ylim([0.01875, 0.019])
+        #plt.savefig(f'../plots/tof-vs-z.png', dpi=300)
+        plt.show()
 
 
 ##########################################################
