@@ -7,7 +7,7 @@
 ########## Settings ##########
 
 input_file = "singlecoil"        #name of the g4bl input file
-use_channel = ["xoffset20"]          #name of single channel
+use_channel = ["dp0p1-xoffset20"]          #name of single channel
 #use_channel = None
 
 import warnings
@@ -25,7 +25,7 @@ plot_options = {
     'px+py vs. z': [0, 1, 1],
     'px py pz vs. z': [0, 1, 1],
     'ptsquared vs. z': [0, 1, 1],
-    'psquared vs. z': [1, 1, 1],
+    'psquared vs. z': [0, 1, 1],
     'p vs. z': [0, 1, 0],
     'Bx By vs. z': [0, 1, 1],
     'Bx By Bz vs. z': [0, 1, 1],
@@ -34,7 +34,8 @@ plot_options = {
     'ref test comparison': [0, 0, 1],
     'rB vs. r': [0, 0, 1],
     'rB vs. z': [0, 1, 1],
-    'Lz vs. z': [0, 1, 1]
+    'Lz vs. z': [0, 1, 1],
+    'dispersion': [0, 0, 1]
 }
 
 analysis_options = {
@@ -45,7 +46,8 @@ analysis_options = {
     'tof -- full length': 0,
     'tof -- pz': 0,
     't vs. z': 0,
-    'tof vs. z': 0
+    'tof vs. z': 0,
+    'dpz vs. z': 1
 }
 
 multiplot_options = {
@@ -62,7 +64,8 @@ channel_labels = {
     "nodet-xoffset020": "No detectors, beam at X=+20mm, Y=0mm",
     "nodet-dp0p1-xoffset020": "No detectors, beam at X=+20mm, Y=0mm, and $\delta p = 0.1$",
     "det-dp0p1-xoffset020": "Detectors at 5000mm intervals, beam at X=+20mm, Y=0mm, and $\delta p = 0.1$",
-    "no-offset": "No offsets"
+    "no-offset": "No offsets",
+    "dp0p1-xoffset20":"Beam at X=20mm, Y=0mm, $\delta p$=0.1"
 }
 
 ######## Dependencies ########
@@ -78,7 +81,7 @@ import os
 ########### Labels ###########
 
 #===== Labels for the data columns =====
-tuple_labels=["x", "y", "z", "Px", "Py", "Pz", "t", "PDGid", "EventID", "Tr    ackID", "ParentID", "Weight", "Bx", "By", "Bz", "Ex", "Ey", "Ez"]
+tuple_labels=["x", "y", "z", "Px", "Py", "Pz", "t", "PDGid", "EventID", "TrackID", "ParentID", "Weight", "Bx", "By", "Bz", "Ex", "Ey", "Ez"]
 
 #========== Units for the data =========
 units = {
@@ -192,9 +195,9 @@ lists = []
 #### plot one channel at a time:
 for channel in channels:
     df = dfs[channel]
-    df = df[df["EventID"] == -1]
-    #ref = df[df["EventID"] == -1]
-    #test = df[df["EventID"] == 1]
+    #df = df[df["EventID"] == -1]
+    ref = df[df["EventID"] == -1]
+    test = df[df["EventID"] == 1]
     lbl = channel_labels["xoffset20"]
     #lbl = "Reference particle, no offsets"
     
@@ -598,17 +601,76 @@ for channel in channels:
         if show == 1:
             plt.show()
     
-    #=============== count tracks ================
-    switch, save, show = plot_options['ref test comparison']
+    #=============== dispersion  ================
+    switch, save, show = plot_options['dispersion']
     if switch == 1:
-        # got these values from checking manually what the duplicates were
-        lists.append(np.unique(test['z']))
-        z_vals = [-0.000500, 0.000500, 5000.0]
-        for z in z_vals:
-            index = ref[ref['z'] == z].index
-            print(ref.iloc[index])
-            index = test[test['z'] == z].index
-            print(test.iloc[index])
+        rx, ry, rz = ref['x'], ref['y'], ref['z']
+        tx, ty, tz = test['x'], test['y'], test['z']
+        
+        s = np.sqrt((rx - tx)**2 + (ry - ty)**2 + (rz - tz)**2)
+
+        p = 200
+        dp = 0.1    
+        D = s * p / dp
+
+        ### Position in z
+        #plt.figure(figsize=(8, 6))
+        #plt.title(f'Particles in z -- {lbl}')
+        #plt.plot(ref['t'], ref['z'], label='Reference particle, $z_0 = 200$ MeV/c')
+        #plt.plot(test['t'], test['z'], label='Test particle, $z_0 = 200.1$ MeV.c')
+        #plt.xlabel('t (ns)')
+        #plt.ylabel('z (mm)')
+        #plt.legend()
+        #plt.tight_layout()
+        #plt.show()
+       
+        ### Position in transverse plane
+        plt.figure(figsize=(8, 6))
+        plt.title(f'Particles in x -- {lbl}')
+        plt.plot(ref['z'], ref['x'], label='Reference particle, $z_0 = 200$ MeV/c')
+        plt.plot(test['z'], test['x'], label='Test particle, $z_0 = 200.1$ MeV.c')
+        plt.xlabel('z (mm)')
+        plt.ylabel('x (mm)')
+        plt.legend()
+        plt.tight_layout()
+        plt.show()
+        
+        ### Position in transverse plane
+        plt.figure(figsize=(8, 6))
+        plt.title(f'Particles in y -- {lbl}')
+        plt.plot(ref['z'], ref['x'], label='Reference particle, $z_0 = 200$ MeV/c')
+        plt.plot(test['z'], test['y'], label='Test particle, $z_0 = 200.1$ MeV.c')
+        plt.xlabel('z (mm)')
+        plt.ylabel('y (mm)')
+        plt.legend()
+        plt.tight_layout()
+        plt.show()
+        #plt.figure(figsize=(8, 6))
+        #plt.title(f'$L_z$ vs. z -- {lbl}')
+       
+
+        #plt.plot(z, Lz, lw=1)
+        
+        #plt.legend()
+        #plt.xlabel('$z$')
+        #plt.ylabel('$L_z$')
+        #plt.tight_layout()
+        #if save == 1:
+        #    plt.savefig(f'../plots/{channel}_Lz-vs-z.png', dpi=300)
+        #if show == 1:
+            #plt.show()
+    
+    #=============== count tracks ================
+    #switch, save, show = plot_options['ref test comparison']
+    #if switch == 1:
+    #    # got these values from checking manually what the duplicates were
+    #    lists.append(np.unique(test['z']))
+    #    z_vals = [-0.000500, 0.000500, 5000.0]
+    #    for z in z_vals:
+    #        index = ref[ref['z'] == z].index
+    #        print(ref.iloc[index])
+    #        index = test[test['z'] == z].index
+    #        print(test.iloc[index])
 #a, b = lists[0], lists[1]
 #print(len(a), len(b))
 #b = np.append(b, np.array([0,0,0]))
@@ -751,6 +813,22 @@ for channel in channels:
         plt.xlabel('z (mm)')
         plt.ylabel('$\Delta t$ (ns)')
         plt.ylim([0.01875, 0.019])
+        #plt.savefig(f'../plots/tof-vs-z.png', dpi=300)
+        plt.show()
+    
+    if analysis_options['dpz vs. z'] == 1:
+        t, z = df['Pz'], df['z']
+        dt = []
+        for i in range(len(df) - 1):
+            delt = t.iloc[i+1] - t.iloc[i]
+            dt.append(delt)
+
+        plt.figure(figsize=(10, 5))
+        #plt.plot(z[1:-1], dt[:-1], lw=0.5)
+        plt.scatter(z[1:], dt, marker='.', s=1)
+        plt.xlabel('z (mm)')
+        plt.ylabel('$\Delta p_z$ (MeV/c)')
+        #plt.ylim([0.01875, 0.019])
         #plt.savefig(f'../plots/tof-vs-z.png', dpi=300)
         plt.show()
 

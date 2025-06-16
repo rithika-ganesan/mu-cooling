@@ -12,7 +12,7 @@ param nbeamevents=100
 param maxStep=5.0
 
 # directory stuff:
-param channelname=no-offset
+param channelname=dp10-xoffset20
 param outdir=../output
 
 # constants:
@@ -24,7 +24,7 @@ param todegrees=180/$pi
 param toradian=$pi/180
 
 # reference particle:
-param dp=0.0 #MeV/c -> displacement
+param dp=10 #MeV/c -> displacement
 param p=200 #MeV/c
 param v=$p*$c/sqrt($p^2+($m*$c)^2)
 
@@ -34,7 +34,7 @@ param dy=0 #mm
 param dxp=0 #radians
 param dyp=0 #radians
  
-param X=0 # beam location in X mm
+param X=20 # beam location in X mm
 param Y=0 # beam location in Y mm
 param Xp=0 #radians
 param Yp=0 #radians
@@ -54,7 +54,7 @@ param tiltz=0.0				#degs
 
 ########### trace ############
 
-trace format=ascii nTrace=0 oneNTuple=1 filename=$outdir/trace_$channelname.txt 
+trace format=ascii nTrace=1 oneNTuple=1 filename=$outdir/trace_$channelname.txt 
 
 ###### define elements #######
 
@@ -68,7 +68,7 @@ beam gaussian particle=$part \
 	sigmaX=0.0 sigmaY=0.0 \ 
 	sigmaXp=0.0 sigmaYp=0.0 \
 	meanMomentum=$p+$dp sigmaP=0.0 \ 
-	meanT=0.0 sigmaT=1.0
+	meanT=0.0 sigmaT=0.0
 
 trackcuts killSecondaries=1
 

@@ -7,7 +7,7 @@
 ########## Settings ##########
 
 input_file = "singlecoil"        #name of the g4bl input file
-use_channel = ["nodet-xoffset020"]          #name of single channel
+use_channel = ["nodet-nooffsets"]          #name of single channel
 #use_channel = None
 
 # switch, save, show
@@ -28,9 +28,10 @@ plot_options = {
     'ref test comparison': [0, 1, 1],
     'rB vs. r': [0, 0, 1],
     'rB vs. z': [0, 1, 1],
-    'tof vs. z': [1, 0, 1],
+    'tof vs. z': [0, 0, 1],
+    'dpz vs. z': [1, 0, 1],
     'step size check': [0, 0, 1],
-    'tof vs. z g4 formula': [1, 0, 1]
+    'tof vs. z g4 formula': [0, 0, 1]
 }
 
 multiplot_options = {
@@ -179,7 +180,7 @@ for channel in channels:
     #ref = df[df["EventID"] == -1]
     #test = df[df["EventID"] == 1]
 #    lbl = channel_labels[channel]
-    #lbl = "Reference particle, no offsets"
+    lbl = "Reference particle, no offsets"
     
     print(channel)
     #=============== x vs. z ================
@@ -547,6 +548,28 @@ for channel in channels:
 #print(len(a), len(b))
 #b = np.append(b, np.array([0,0,0]))
 
+    #================= del pz ===============
+    if plot_options['dpz vs. z'][0] == 1:
+        t, z, pz = df['z'], df['z'], df['Pz'] 
+        dt = []
+        for i in range(len(df) - 1):
+            delt = t.iloc[i+1] - t.iloc[i]
+            dt.append(delt)
+       
+        #print(z.iloc[0], z.iloc[-1])
+
+        dt = np.array(dt)
+        plt.figure(figsize=(10, 5))
+        plt.plot(z[1:-1], dt[:-1], lw=0.5)
+        plt.scatter(z[1:-1], dt[:-1], s=5)
+        plt.title('Difference in $z$ between steps -- maxStep=100mm, no offsets')
+        plt.xlabel('z (mm)')
+        plt.ylabel('$\Delta z$ (mm)')
+        #plt.ylim([0.01875, 0.019])
+        plt.tight_layout()
+        #plt.savefig(f'../plots/coarse-nooffsets-tof-vs-z.png', dpi=300)
+        plt.show()
+    
     #================= time of flight ===============
     if plot_options['tof vs. z'][0] == 1:
         t, z, pz = df['t'], df['z'], df['Pz'] 
