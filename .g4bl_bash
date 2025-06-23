@@ -1,31 +1,38 @@
 #!/bin/bash
 
+## Interactive g4bl
+alias intg4bl="docker run --rm --platform linux/amd64 -v /Users/rithika/utkcms/mu-cooling:/mu-cooling -it valetov/g4bl:3.08 /bin/bash"
+
+rung4bl() {
+	docker run --rm --platform linux/amd64 -v /Users/rithika/utkcms/mu-cooling:/mu-cooling/ valetov/g4bl:3.08 g4bl /mu-cooling/$1
+}
+
 main_directory="/Users/rithika/utkcms/mu-cooling" 	# project directory
-channel_directory="$main_directory/channels/"     # directory containing different channel designs
-input_template=".input.in"
+#channel_directory="$main_directory/channels/"     # directory containing different channel designs
+#input_template=".input.in"
 
 # Usage: mkchannel single-solenoid
 # Creates a directory "single-solenoid" in channels with three sub-directories
-mkchannel() {
-	mkdir $channel_directory$1
-	cd $channel_directory$1
-	mkdir src output plots
-}
+#mkchannel() {
+#	mkdir $channel_directory$1
+#	cd $channel_directory$1
+#	mkdir src output plots
+#}
 
 # Usage: mkinput single-solenoid notilt.in
 # Creates a copy of template from input_template as notilt.in
-mkinput() {
-	local dirname=$1
-	local inputname=$2
-	local paramtochange=channelname
-
-	cp $main_directory/$input_template $channel_directory/$dirname/src/$inputname.in
-
-	cd $channel_directory/$dirname/src
-	
-	sed -i '' "/param $paramtochange=/c\\
-param $paramtochange=$inputname
-	" $inputname.in
-}
+#mkinput() {
+#	local dirname=$1
+#	local inputname=$2
+#	local paramtochange=channelname
+#
+#	cp $main_directory/$input_template $channel_directory/$dirname/src/$inputname.in
+#
+#	cd $channel_directory/$dirname/src
+#	
+#	sed -i '' "/param $paramtochange=/c\\
+#param $paramtochange=$inputname
+#	" $inputname.in
+#}
 
 alias wd="cd $main_directory"

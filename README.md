@@ -5,30 +5,49 @@ Caroline's muon cooling [GitHub](https://github.com/criggall/muon-cooling?tab=re
 Solenoid study [GitHub](https://github.com/criggall/solenoid-study)  
 g4beamline [documentation](https://www.muonsinc.com/Website1/Muons/G4beamlineUsersGuide.pdf) <br>
 
-
 ### Relevant papers
 
-[Muon collider design](https://arxiv.org/abs/acc-phys/9604001)
-
-
+[Muon collider design](https://arxiv.org/abs/acc-phys/9604001)   
 [Helical FOFO Snake for Initial Six-Dimensional Cooling of Muons](https://inspirehep.net/literature/1678715)  
 [A High-Performance Rectilinear FOFO Channel for Muon Cooling](http://accelconf.web.cern.ch/PAC2013/papers/thpho12.pdf)  
 [Solenoidal ionization cooling lattices](https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.10.064001)
 
 ### Resources
 
-- USPAS lectures
-- Mini lecture series from Katsuya
-- Wiedemann
-- Book 2
-- Book 3
 
-### This directory
+
+### Repo structure
+
+<pre>
+.g4bl_bash   
+.README.md    
+.    
+|---src   
+|   '----uproot_g4bl.py    
+|   
+|---input   
+|   |----singlecoil.in   
+|   |----HFOFO-matching-frozen.in  
+|   |----matching.in  
+|   '----solenoid-matching.in  
+|  
+|---output  
+|   |----singlecoil  
+|   |----matching  
+|   '----solenoid-matching  
+|  
+'---other  
+    |---slides  
+    |---resources  
+    |   '---notes  
+    '---ascii  
+</pre>
 
 **Bash commands**
 
-.g4bl_bash has custom commands to make working with g4beamline and multiple design channels easier. Run `source .g4bl_bash`.
-
+- Source: `source .g4bl_bash`
+- Run `intg4bl` to launch Docker container interactive terminal
+- Run `rung4bl path/to/inputfile.in` to run g4bl in the container.  
 
 
 <!--- 
