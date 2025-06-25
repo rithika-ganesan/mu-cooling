@@ -1,7 +1,7 @@
 import argparse
 import glob
 import re
-from read import read_files
+from read_old import read_files
 import matplotlib.pyplot as plt
 
 # Parser set-up
