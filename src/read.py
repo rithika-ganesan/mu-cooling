@@ -1,263 +1,147 @@
-#-----------------------------------------------------------
+#-----------------------------------------------------------------
 
-# Import g4bl trace .root files into Python with uproot
+# Import g4bl trace files into Python with uproot and pandas
 
-#-----------------------------------------------------------
+# Usage:
+# import read
+# data, labels = read.read_trace(path)
+# path can be a string or a list of strings
 
-#======== Dependencies ========
+#------------------------------------------------------------------
 
-import uproot 
-import awkward as ak
-import pandas as pd
+#============= Dependencies =============
+
+import uproot
 import numpy as np
-import re
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from scipy.interpolate import CubicSpline
+from pathlib import Path
+import pandas as pd
 import glob
-from PIL import Image
+
+#=============== Options ================
 
 # Set default conversion to pandas dataframes
 # Can also be 'ak' for awkward arrays or 'np' for numpy
-uproot.default_library = 'pd'
-lib = 'pd'
-plot_params = {
-    'landscape figsize': (8, 6),
-    'labels': {
-        "x": "x (mm)",
-        "y": "y (mm)",
-        "z": "z (mm)",
-        "Px": "$p_x$ (MeV/c)", 
-        "Py": "$p_y$ (MeV/c)",
-        "Pz": "$p_z$ (MeV/c)",
-        "t": "$t$ (ns)",
-        "PDGid": None,
-        "EventID": None,
-        "TrackID": None,
-        "ParentID": None,
-        "Weight": None,
-        "Bx": "$B_x$ (T)",
-        "By": "$B_y$ (T)",
-        "Bz": "$B_z$ (T)",
-        "Ex": "$E_x$ (MV/m)",
-        "Ey": "$E_y$ (MV/m)",
-        "Ez": "$E_z$ (MV/m)",
-        "Lz": "$L_z$"
-    },
-    'default plots': {
-        'x-v-z': ['z', 'x'],
-        'y-v-z': ['z', 'y'],
-        'px-v-z': ['z', 'Px'],
-        'py-v-z': ['z', 'Py'],
-        'pz-v-z': ['z', 'Pz'],
-        'Bx-v-z': ['z', 'Bx'],
-        'By-v-z': ['z', 'By'],
-        'Bz-v-z': ['z', 'Bz']
-    },
-    'dpi': 300 
-}
+uproot.default_library, lib = 'pd', 'pd'
 
-# Integer variables
-ip = ['PDGid', 'EventID', 'TrackID', 'ParentID', 'Weight']
+# Tuple labels for reading ascii
+tuple_labels=["x", "y", "z", "Px", "Py", "Pz", "t", "PDGid", "EventID", "TrackID", "ParentID", "Weight", "Bx", "By", "Bz", "Ex", "Ey", "Ez"]
 
-#========  Functions      ========
+#============== Functions ===============
 
-# Find if multiple files or single:
-def multiple_files(paths):
-    if len(paths) > 1:
-        return True
-    elif len(paths) == 1:
-        return False
-    elif len(paths) == 0:
-        raise NameError("No files found.")
-
-# Find if a given root file has one NTuple or multiple
-def is_all_tracks(file):
+# Check if a given root trace file has all tracks or separate tracks
+def is_all_tracks_root(file):
     if 'Trace/AllTracks;1' in file.keys():
         return True
     else:
         return False
     
 # Find if a given root file has reference and tune particles
-def has_reference_particle(file):
+def has_reference_particle_root(file):
     if 'Trace/ReferenceParticle;1' in file.keys():
         return True
     else:
         return False 
-        
-# Find if a given root file has individual event tracks and count them
-def count_event_tracks(file):
-    return sum([bool(re.match('Trace/Ev.*Trk.*', key)) for key in file.keys()])
 
-# Get event ids and keys for a file that has individual event tracks
-def get_event_ids(file):
-    ids, keys = [], []
-    for key in file.keys():
-        match = re.match('Trace/Ev(.*)Trk.*', key)
-        if match != None:
-            ids.append(int(match.group(1)))
-            keys.append(key)
-    return ids, keys
-
-# Get event iteration object
-def get_event_iterator(path, eventkeys, lib=lib):
-    return uproot.iterate(get_list_of_event_paths(path, eventkeys), library=lib)
-    
-# Get paths for events
-def get_list_of_event_paths(path, eventkeys):
-    return [f"{path}:" + key for key in eventkeys]
-
-# Get events for a given trace file path
-def get_file_events(path):
+# Read a single root trace file that has AllTracks
+def read_root_trace_alltracks(file):
+    tree = file['Trace/AllTracks'].arrays(library=lib) 
     events = {}
-    with uproot.open(path=path) as file:
-        if is_all_tracks(file) == True:
-            tree = file['Trace/AllTracks'].arrays(library=lib)
-            for eid in np.unique(tree["EventID"]).astype(int):
-                events[eid] = tree[tree["EventID"] == eid]
-
-        if has_reference_particle(file) == True:
-            events[-2] = file['Trace/TuneParticle'].arrays(library=lib)
-            events[-1] = file['Trace/ReferenceParticle'].arrays(library=lib)
-
-        if count_event_tracks(file) != 0:
-            eventids, eventkeys = get_event_ids(file)
-            for event in get_event_iterator(path, eventkeys):
-                events[int(max(event['EventID']))] = event
-    
+    for eventid in np.unique(tree["EventID"]).astype(int):
+        events[eventid] = tree[tree["EventID"] == eventid]
     return events
 
-# Initialize a 2d plot
-def init_plot(x, y, figsize=plot_params['landscape figsize'], labels=plot_params['labels']):
-    fig, ax = plt.subplots(figsize=figsize)
-    fig.dpi = plot_params['dpi']
-    fig.x_param = x
-    fig.y_param = y
-    ax.set_xlabel(labels[x])
-    ax.set_ylabel(labels[y])
-    return fig, ax
+# Read a single root trace file from path that has separate tracks
+def read_root_trace_septracks(file):
+    events = {}
+    for key in file.keys():
+        if key != 'Trace;1':
+            tree = file[key].arrays(library=lib)
+            eventids = np.unique(tree["EventID"]).astype(int)
+            if len(eventids) == 1:
+                events[eventids[0]] = tree
+            else:
+                events["All"] = tree
+    return events
 
-# Close out the plot
-# If you want to save it, set save='pathname'
-def fin_plot(fig, ax, show=1, save=0, store=0, no_legend=False):
-    if len(ax.collections) != 0 or len(ax.lines) != 0:
-        if no_legend != True:
-            ax.legend()
-    fig.tight_layout()
-    if save != 0:
-        plt.savefig(save)
-    if show == 1:
-        plt.show()
-    if show == 0 and store == 0:
-        plt.close()
-    return fig, ax
+# Read a single root trace file from path
+def read_root_trace(path):
+    with uproot.open(path=path) as file:
+        if is_all_tracks_root(file) == True:
+            return read_root_trace_alltracks(file)
+        else:
+            return read_root_trace_septracks(file)
+        
+# Read a single ascii trace file from path that has alltracks
+def read_ascii_trace_alltracks(path, comment='#'):
+    df = pd.read_csv(f'{path}', comment=comment, header=None, sep='\\s+')
+    length = df.shape[1]
+    df.columns = tuple_labels[:length]
+    events = {"All": df}
+    for eventid in np.unique(df["EventID"]).astype(int):
+        events[eventid] = df[df["EventID"] == eventid]
+    return events
 
+# Read a single ascii trace file from path (directory) that has separate
+def read_ascii_trace_septracks(path, comment='#'):
+    print('Not configured yet!')
+    return None
 
-# Initialize plot in x-y plane
-def init_transverse_plot(event, innerradius=350, outerradius=500):
-    fig, ax = plt.subplots(figsize=(6, 6))
-    fig.dpi = 300
-    ax.axvline(0, lw=0.5, c='k')
-    ax.axhline(0, lw=0.5, c='k')
+# Read a single root trace file from path
+def read_ascii_trace(path, cmnt='#'):
+    alltracks = 1
+    if alltracks == True:
+        return read_ascii_trace_alltracks(path, comment=cmnt)
+    else:
+        return read_ascii_trace_septracks(path)
+        
+# Check if file at given path is a root file
+def is_root(path):
+    p = Path(path)
+    if p.suffix == '.root':
+        return True
+    else:
+        return False
+    
+# Read a single trace file from path
+def read_path_trace(path):
+    if is_root(path) == True:
+        return read_root_trace(path)
+    else:
+        return read_ascii_trace(path)
+    
+# Get the stem of a given path 
+def path_label(path, n):
+    p = Path(path)
+    return p.stem
+    
+# Read multiple files (or a single file) from path using the path stem as the label
+# Use a different function for diff labels
+# Function has to have path and counter n both as positional arguments
+def read_trace(filepaths, label_fn=path_label):
+    if type(filepaths) == str:
+        paths = sorted(glob.glob(filepaths))
+    elif len(filepaths) >= 1:
+        paths = sorted([glob.glob(path) for path in filepaths])
+    else:
+        raise ValueError("Unknown path type. Use a list of strings or a regex string.")
+    
+    data = {}
+    for n, path in enumerate(paths):
+        label = label_fn(path, n)
+        data[label] = read_path_trace(path)
 
-    inner = patches.Circle((0, 0), innerradius, lw=1, facecolor=(1.0, 1.0, 1.0), edgecolor=(1.0, 0.0, 0.0))
-    outer = patches.Circle((0, 0), outerradius, lw=1, facecolor=(1.0, 0.0, 0.0), edgecolor=(1.0, 1.0, 1.0), alpha=0.3, label='RotSol')
+    labels = list(data.keys())
 
-    ax.set_ylabel('')
-    ax.set_xlabel('')
-    ax.add_patch(outer)
-    ax.add_patch(inner)
-
-    return fig, ax
-
-# Close plot in x-y plane
-def fin_transverse_plot(fig, ax, title, show=1, save=0, store=0, no_legend=False):
-    ax.set_title(title)
-    if len(ax.collections) > 0 or len(ax.lines) > 0:
-        if no_legend != True:
-            ax.legend()
-    fig.tight_layout()
-    if save != 0:
-        fig.savefig(save)
-    if show == 1:
-        plt.show()
-    if show == 0 and store == 0:
-        plt.close()
-
-    return fig, ax
-
-# Create and add patch for g4bl element along the z-axis
-# Angle is in degrees and is anticlockwise from x-axis
-def add_element_patch(ax, name, length, inner, outer, z, pitch, facecolor, alpha=0.3):
-    x = z - (length / 2)
-    y = -inner
-    xlen = length
-    ylen = inner*2
-
-    middle = patches.Rectangle((x, y), xlen, ylen, facecolor=facecolor, alpha=alpha*0.5, label=name, rotation_point='center', angle=pitch)
-
-    yt = inner
-    yb = -outer
-    yylen = outer - inner
-
-    top = patches.Rectangle((x, yt), xlen, yylen, facecolor=facecolor, alpha=alpha, rotation_point='center', angle=pitch)    
-    bottom = patches.Rectangle((x, yb), xlen, yylen, facecolor=facecolor, alpha=alpha, rotation_point='center', angle=pitch)
-
-    ax.add_patch(top)
-    ax.add_patch(bottom)
-    ax.add_patch(middle)
-    ax.legend()
-    ax.set_zorder(1)
-    ax.patch.set_visible(False)
-
-    return ax
-
-# Round to the nearest multiple
-def m_round(arr, multiple):
-    return np.round(arr / multiple) * multiple
-
-# Get evenly distributed values between the minimum and maximum of an array 
-def get_even_distr(vals, step):
-    z = vals
-    min_z, max_z = m_round(min(z), step), m_round(max(z), step)
-    tot = np.abs(min_z) + np.abs(max_z)
-    count = int(tot / step) + 1
-    zs = np.linspace(min_z, max_z, count)
-    return zs
-
-# Get splined version of event
-def get_splined_event(event, newvals, intcols=ip, basecol='z'):
-    z = event[basecol]
-    splined_cols = {}
-    for l in event.columns.tolist():
-        cs = CubicSpline(z, event[l])
-        if l not in intcols:
-            splined_cols[l] = cs(newvals)
-        else: 
-            splined_cols[l] = cs(newvals).astype(int)
-    splined_event = pd.DataFrame(splined_cols)
-    return splined_event
-
-# Read for multiple files
-def multiple(paths):
-    files = {}
-    for path in paths:
-        files[path] = get_file_events(path)
-    return paths, files
-
-# Read for single file
-def single(paths):
-    path = paths[0]
-    events = get_file_events(path)
-    return path, events
-
-# Read from path
-def read_files(paths):
-    if multiple_files(paths) == True:
-        paths, files = multiple(paths)
-        return paths, files
-    elif multiple_files(paths) == False:
-        path, events = single(paths)
-        return path, events
+    if len(data) == 1:
+        return data[labels[0]], labels[0]
+    else:
+        return data, labels
+        
 
 
+
+
+
+
+
+            
