@@ -1,0 +1,30 @@
+place RotSol z=-3000
+place SolPos z=500 current=$cur1
+place SolNeg z=1200 current=$cur2
+place SolPos z=1900 current=$cur3 rotation=X$pitch3,Z$roll3
+place SolNeg z=2600 current=$cur4 rotation=X$pitch4,Z$roll4
+place SolPos z=3300 rotation=X$pitch5,Z$roll5
+place SolNeg z=4000 rotation=X$pitch6,Z$roll6
+  
+place SolPos z=500+$period*1 rotation=X$pitch7,Z$roll7
+place SolNeg z=1200+$period*1 rotation=X$pitch8,Z$roll8
+place SolPos z=1900+$period*1 rotation=X$pitch9,Z$roll9
+place SolNeg z=2600+$period*1 current=-94.482 rotation=X$pitch,Z240
+place SolPos z=3300+$period*1 current=94.307 rotation=X$pitch
+place SolNeg z=4000+$period*1 current=-94.136 rotation=X$pitch,Z120
+  
+place SolPos z=500+$period*1 rotation=X$pitch7,Z$roll7
+place SolNeg z=1200+$period*1 rotation=X$pitch8,Z$roll8
+place SolPos z=1900+$period*1 rotation=X$pitch9,Z$roll9
+place SolNeg z=2600+$period*1 current=-94.482 rotation=X$pitch,Z240
+place SolPos z=3300+$period*1 current=94.307 rotation=X$pitch
+place SolNeg z=4000+$period*1 current=-94.136 rotation=X$pitch,Z120
+ 
+place SolPos z=500+$period*2 current=$cur9 rotation=X$pitch15,Z$roll15
+place SolNeg z=1200+$period*2 current=-$cur9 rotation=X$pitch14,Z$roll14
+place SolPos z=1900+$period*2 current=$cur9 rotation=X$pitch13,Z$roll13
+place SolNeg z=2600+$period*2 current=$cur8 rotation=X$pitch12,Z$roll12
+place SolPos z=3300+$period*2 current=$cur7 rotation=X$pitch11,Z$roll11
+place SolNeg z=4000+$period*2 current=$cur6
+place SolPos z=500+$period*2 current=$cur5
+place RotSol z=4050+$period*2

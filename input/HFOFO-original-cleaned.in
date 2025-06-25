@@ -1,0 +1,469 @@
+# HFOFO cooling channel
+# Original design by Y. Alexahin
+# 'Cleaned' version
+# The channel has:
+#       (a) a phase rotator (technically part of the front end)
+#       (b) matching section (6 solenoids)
+#       (c) 30 HFOFO periods (6 solenoids each)
+#       (d) exit solenoid
+
+#=== Input parameters ===
+
+# Define physics
+physics QGSP_BIC 
+param pi=3.1415926
+
+# Define and declare world material
+material GH2 Z=1 A=1.01 density=0.014 # 20% of LH2
+param worldMaterial=GH2
+
+# Channel params   
+param zshift=60                     # I think this comes from the space between the first RF outside phase rotator and the pressure wall/absorber tube 
+param period=4200                   # HFOFO period
+param spacing=700                   # z spacing per solenoid (period / 6)
+param abszinitial=150               # Initial value for absorber placement
+param np=31                         # Number of snake periods
+param zlastRF=$np*$period+1450      # End 
+
+trackcuts keep=mu+,mu-,pi+,pi- kineticEnergyCut=50
+param maxStep=10.0 steppingVerbose=0 nTrace=0
+
+# Beam params  
+param beamstart=-700            # From the rotator solenoid exit at z=0
+# beam ascii file=initial.dat beamZ=$beamstart # user provided file with particle data
+
+#=== Hard-coded values ===
+
+# RF time offsets
+
+param beamtime=-0.671 # average time of mu+ in initial.dat modulo RF period TRF
+# if there is no mu+ take mu- and add TRF/2
+param toffs0=$beamtime-$beamstart/275.89-.07 # time needed to travel from beamZ to 0
+param toffs1=$toffs0-.061-.0026+.0115+.006 # timing on the beam core done iteratively
+param toffs2=$toffs1-.064+.149-.0052-.0029
+param toffs3=$toffs2
+param toffs4=$toffs3
+param toffs5=$toffs4-.008
+param toffs6=$toffs5
+
+# Coil tilts and currents
+
+param pitch=-0.0025*180/$pi
+param BLS=21.4 delf=0
+param cur0=4.421*$BLS
+param curpl=$cur0*(1+$delf/2) curmn=-$cur0*(1-$delf/2) 
+param cur1=4.421*10.98 cur2=-4.421*17.89 cur3=4.421*19.64 cur4=-4.421*21.12 # entrance
+param cur5=4.421*10.06 cur6=-4.421*16.03 cur7=4.421*17.81 cur8=-4.421*19.17 cur9=4.421*19.20 # exit
+
+param pitch3=0.08864577034195348 roll3=-122.41026081625786
+param pitch4=0.12464581967694571 roll4=-23.560570626769156
+param pitch5=0.08629462092385154 roll5=122.33834527427146
+param pitch6=0.08165184417494886 roll6=-102.00442842295992
+param pitch7=0.09691027250132747 roll7=25.337767430563712
+param pitch8=0.16724456260285453 roll8=137.78049184460176
+param pitch9=0.12260330888794266 roll9=-96.95844485200807
+
+param pitch11=0.07593124742514547 roll11=-142.88458588297945
+param pitch12=0.11279544772856832 roll12=146.18889976896574
+param pitch13=0.04893880584285693 roll13=-8.336483738254113
+param pitch14=0.053397843651017296 roll14=-159.51068973155816
+param pitch15=0.07178996757849956 roll15=73.37746980895987
+param pitch16=0.17386192910255718 roll16=-8.484712115696667
+param pitch17=0.13876296722336035 roll17=-126.87136703740387
+
+# RF cavities
+
+param Grad=25
+param Grad0=20
+
+#=== Define beam and reference ====
+
+beam gaussian particle=mu+ nEvents=100 beamZ=-700.0 \
+    sigmaX=10.0 sigmaY=10.0 sigmaXp=0.100 sigmaYp=0.100 \
+    meanMomentum=200.0 sigmaP=4.0 meanT=0.0 sigmaT=0.0
+
+#=== Define elements ===
+
+# Virtual detectors
+
+do i 1 $np
+
+    virtualdetector Det$i file=out$i format=ascii radius=360 color=0,1,0 length=0.001 material=Vacuum
+
+enddo
+
+virtualdetector DetLast file=outlast format=ascii radius=300 color=0,1,0 length=0.001 material=Vacuum
+
+# Coils and solenoids
+
+coil kat0 innerRadius=360 outerRadius=500 length=6000 nSheets=10 maxR=360 maxZ=9000 dR=20 dZ=20 \
+tolerance=0.003 
+
+coil kat11 innerRadius=420 outerRadius=600 length=300 nSheets=10 maxR=360 maxZ=6000 dR=15 dZ=15 \
+tolerance=0.003 
+
+solenoid RotSol coilName=kat0 current=11.37 kill=1 
+solenoid SolPos coilName=kat11 current=$curpl kill=1 color=1,0,1 # color=1,0,1  
+solenoid SolNeg coilName=kat11 current=$curmn kill=1 color=0,0,1 # color=0,0,1  
+
+# RF cavities
+
+pillbox RFC0 innerLength=249 frequency=0.325 maxGradient=$Grad0 \
+win1Thick=0 win1OuterRadius=0 collarThick=0 collarRadialThick=0\
+winMat=Be irisRadius=300 win2Thick=0.12 wallThick=0.4 pipeThick=0.4 
+
+pillbox RFC innerLength=249 frequency=0.325 maxGradient=$Grad \
+win1Thick=0 win1OuterRadius=0 collarThick=0 collarRadialThick=0\
+winMat=Be irisRadius=300 win2Thick=0.12 wallThick=0.4 pipeThick=0.4 cavityMaterial=GH2 kill=1
+
+pillbox RFC1 innerLength=249 frequency=0.325 maxGradient=$Grad \
+win1Thick=0 win1OuterRadius=0 collarThick=0 collarRadialThick=0\
+winMat=Be irisRadius=250 win2Thick=0.1 wallThick=0.4 pipeThick=0.4 cavityMaterial=GH2 kill=1
+
+pillbox RFC2 innerLength=249 frequency=0.325 maxGradient=$Grad \
+win1Thick=0 win1OuterRadius=0 collarThick=0 collarRadialThick=0\
+winMat=Be irisRadius=200 win2Thick=0.07 wallThick=0.4 pipeThick=0.4 cavityMaterial=GH2 kill=1
+
+# Absorbers
+
+tubs abtube length=160 innerRadius=500 outerRadius=550 material=Vacuum kill=1 color=invisible
+tubs terminus length=1 innerRadius=0 outerRadius=360 material=Vacuum kill=1 color=invisible
+tubs presswall length=4 outerRadius=360 material=Stainless316 color=invisible
+trap wedge0 height=350 length=700 upperWidth=0.005 lowerWidth=59.5 material=LITHIUM_HYDRIDE color=0,0,1 
+
+# Macros
+
+### Add a HFOFO period of 6 solenoids
+### Usage: HFOFOSolPeriod <period-number> poscurrent1 negcurrent1 poscurrent2 negcurrent2 poscurrent3 negcurrent3
+define HFOFOSolPeriod \
+    "place SolPos z=500+$period*$1 current=$2 rotation=X$pitch7,Z$roll7" \
+    "place SolNeg z=1200+$period*$1 current=$3 rotation=X$pitch8,Z$roll8" \
+    "place SolPos z=1900+$period*$1 current=$4 rotation=X$pitch9,Z$roll9" \
+    "place SolNeg z=2600+$period*$1 current=$5 rotation=X$pitch,Z240" \
+    "place SolPos z=3300+$period*$1 current=$6 rotation=X$pitch" \
+    "place SolNeg z=4000+$period*$1 current=$7 rotation=X$pitch,Z120" 
+
+### Add a HFOFO period of 6+6 RF cavities 
+### Usage:
+### HFOFORFCPeriodA RFC0 1 0.075 0.125 0.215 0.265 0.355 0.405 
+### HFOFORFCPeriodB RFC 2 0.075 0.125 0.215 0.265 0.355 0.405
+define HFOFORFCPeriodA \
+    "place $1 z=375+$period*$2 timeOffset=$3" \
+    "place $1 z=625+$period*$2 timeOffset=$4" \
+    "place $1 z=1075+$period*$2 timeOffset=$5" \
+    "place $1 z=1325+$period*$2 timeOffset=$6" \
+    "place $1 z=1775+$period*$2 timeOffset=$7" \
+    "place $1 z=2025+$period*$2 timeOffset=$8" 
+
+define HFOFORFCPeriodB \
+    "place $1 z=2475+$period*$2 timeOffset=$3" \
+    "place $1 z=2725+$period*$2 timeOffset=$4" \
+    "place $1 z=3175+$period*$2 timeOffset=$5" \
+    "place $1 z=3425+$period*$2 timeOffset=$6" \
+    "place $1 z=3875+$period*$2 timeOffset=$7" \
+    "place $1 z=4125+$period*$2 timeOffset=$8" 
+
+### Add a period of six wedge absorbers
+### Usage: WedgeFullPeriod <period-number> <w1> <w2> <w3> <w4> <w5> <w6>
+define WedgeFullPeriod \
+    "place wedge0 x=-79.11 y=-155.4 rotation=Y90,Z-26.97 lowerWidth=$2 z=150+$period*$1" \
+    "place wedge0 x=174.2 y=9.204 rotation=Y90,Z93.03 lowerWidth=$3 z=850+$period*$1" \
+    "place wedge0 x=-95.05 y=146.2 rotation=Y90,Z213.0 lowerWidth=$4 z=1550+$period*$1" \
+    "place wedge0 x=-79.11 y=-155.4 rotation=Y90,Z333.0 lowerWidth=$5 z=2250+$period*$1" \
+    "place wedge0 x=174.2 y=9.204 rotation=Y90,Z453.0 lowerWidth=$6 z=2950+$period*$1" \
+    "place wedge0 x=-95.05 y=146.2 rotation=Y90,Z573.0 lowerWidth=$7 z=3650+$period*$1"
+
+
+#--------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------
+#============================================ Place elements ======================================
+#--------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------
+
+
+#-------------------------------------------
+# Front end : z -> [-6000, 0]
+
+### Solenoid: phase rotator
+place RotSol z=-3000
+
+### RFCs 
+place RFC0 z=-425. timeOffset=$toffs0-0.77123842
+place RFC0 z=-175. timeOffset=$toffs0+0.13491993
+
+### Absorbers
+# None
+
+### Detectors
+# None
+#===========================================
+
+
+
+
+#--------------------------------------------
+# Matching section : z -> [0, 4200]
+
+### Solenoids
+HFOFOSolPeriod 0 $cur1 $cur2 $cur3 $cur4 $curpl $curmn
+
+### RFCs 
+place RFC0 z=75. timeOffset=$toffs0+1.0410783
+
+place RFC0 z=325. timeOffset=$toffs0+1.9472366
+place RFC0 z=575. timeOffset=$toffs0+2.853395
+place RFC z=1075 timeOffset=$toffs1+4.6712809
+place RFC z=1325 timeOffset=$toffs1+5.5805068
+place RFC z=1775 timeOffset=$toffs1+7.2180941
+place RFC z=2025 timeOffset=$toffs1+8.1284101
+place RFC z=2475 timeOffset=$toffs1+9.7679614
+place RFC z=2725 timeOffset=$toffs1+10.679369
+place RFC z=3175 timeOffset=$toffs1+12.320888
+place RFC z=3425 timeOffset=$toffs1+13.23339
+place RFC z=3875 timeOffset=$toffs1+14.876879
+place RFC z=4125 timeOffset=$toffs1+15.790477
+
+
+### Absorbers   
+# Period 0 -- matching section
+place presswall z=850
+place abtube z=850
+place abtube z=1550
+place abtube z=2250
+place abtube z=2950
+place abtube z=3650
+
+### Detectors
+### Placed with loop in the main HFOFO periods section
+
+#===========================================
+
+
+
+#--------------------------------------------
+# Main HFOFO periods :  z -> [4200, 4200*($np+1)]
+
+### Solenoids
+
+HFOFOSolPeriod 1 $curpl $curmn $curpl -94.482 94.307 -94.136
+HFOFOSolPeriod 2 93.969 -93.805 93.645 -93.488 93.334 -93.184
+HFOFOSolPeriod 3 93.037 -92.892 92.751 -92.612 92.476 -92.343
+HFOFOSolPeriod 4 92.213 -92.085 91.959 -91.836 91.715 -91.597
+HFOFOSolPeriod 5 91.481 -91.367 91.255 -91.145 91.038 -90.932
+HFOFOSolPeriod 6 90.828 -90.726 90.626 -90.528 90.432 -90.337
+HFOFOSolPeriod 7 90.244 -90.153 90.063 -89.975 89.888 -89.803
+HFOFOSolPeriod 8 89.719 -89.637 89.556 -89.476 89.398 -89.322
+HFOFOSolPeriod 9 89.246 -89.172 89.099 -89.027 88.956 -88.887
+HFOFOSolPeriod 10 88.818 -88.751 88.685 -88.620 88.556 -88.493
+HFOFOSolPeriod 11 88.431 -88.370 88.310 -88.251 88.193 -88.136
+HFOFOSolPeriod 12 88.079 -88.024 87.969 -87.916 87.863 -87.811
+HFOFOSolPeriod 13 87.759 -87.709 87.659 -87.610 87.562 -87.514
+HFOFOSolPeriod 14 87.468 -87.422 87.376 -87.331 87.287 -87.244
+HFOFOSolPeriod 15 87.201 -87.159 87.118 -87.077 87.036 -86.997
+HFOFOSolPeriod 16 86.958 -86.919 86.881 -86.843 86.807 -86.770
+HFOFOSolPeriod 17 86.734 -86.699 86.664 -86.630 86.596 -86.562
+HFOFOSolPeriod 18 86.530 -86.497 86.465 -86.434 86.402 -86.372
+HFOFOSolPeriod 19 86.342 -86.312 86.282 -86.253 86.225 -86.197
+HFOFOSolPeriod 20 86.169 -86.141 86.114 -86.088 86.061 -86.035
+HFOFOSolPeriod 21 86.010 -85.985 85.960 -85.935 85.911 -85.887
+HFOFOSolPeriod 22 85.863 -85.840 85.817 -85.794 85.772 -85.750
+HFOFOSolPeriod 23 85.728 -85.707 85.686 -85.665 85.644 -85.624
+HFOFOSolPeriod 24 85.604 -85.584 85.565 -85.545 85.526 -85.507
+HFOFOSolPeriod 25 85.489 -85.471 85.453 -85.435 85.417 -85.400
+HFOFOSolPeriod 26 85.383 -85.366 85.349 -85.333 85.317 -85.300
+HFOFOSolPeriod 27 85.285 -85.269 85.254 -85.238 85.223 -85.209
+HFOFOSolPeriod 28 85.194 -85.179 85.165 -85.151 85.137 -85.124
+HFOFOSolPeriod 29 85.110 -85.097 85.083 -85.070 85.058 -85.045
+HFOFOSolPeriod 30 $cur9 -$cur9 $cur9 $cur8 $cur7 $cur6
+
+
+### RFCs
+# Periods 1 - 30
+HFOFORFCPeriodA RFC 1 $toffs1+17.43594 $toffs1+18.350636 $toffs1+19.998077 $toffs1+20.913873 $toffs1+22.563296 $toffs1+23.480193 
+HFOFORFCPeriodB RFC 1 $toffs2+25.132058 $toffs2+26.049908 $toffs2+27.702303 $toffs2+28.620446 $toffs2+30.273366 $toffs2+31.191799 
+
+HFOFORFCPeriodA RFC 2 $toffs2+32.845237 $toffs2+33.763957 $toffs2+35.417908 $toffs2+36.33691 $toffs2+37.991367 $toffs2+38.910649 
+HFOFORFCPeriodB RFC 2 $toffs2+40.565607 $toffs2+41.485166 $toffs2+43.140618 $toffs2+44.06045 $toffs2+45.716392 $toffs2+46.636494 
+
+HFOFORFCPeriodA RFC 3 $toffs2+48.292919 $toffs2+49.213288 $toffs2+50.870191 $toffs2+51.790824 $toffs2+53.448199 $toffs2+54.369092 
+HFOFORFCPeriodB RFC 3 $toffs2+56.026934 $toffs2+56.948086 $toffs2+58.606389 $toffs2+59.527795 $toffs2+61.186555 $toffs2+62.108213 
+
+HFOFORFCPeriodA RFC 4 $toffs2+63.767423 $toffs2+64.689331 $toffs2+66.348986 $toffs2+67.27114 $toffs2+68.931236 $toffs2+69.853633 
+HFOFORFCPeriodB RFC 4 $toffs2+71.514164 $toffs2+72.436802 $toffs2+74.097764 $toffs2+75.020639 $toffs2+76.682026 $toffs2+77.605136 
+
+HFOFORFCPeriodA RFC 5 $toffs2+79.266944 $toffs2+80.190286 $toffs2+81.85251 $toffs2+82.776082 $toffs2+84.438717 $toffs2+85.362516 
+HFOFORFCPeriodB RFC 5 $toffs2+87.025556 $toffs2+87.94958 $toffs2+89.613022 $toffs2+90.537267 $toffs2+92.201106 $toffs2+93.12557 
+
+HFOFORFCPeriodA RFC 6 $toffs2+94.789802 $toffs2+95.714483 $toffs2+97.379102 $toffs2+98.303998 $toffs2+99.969 $toffs2+100.89411 
+HFOFORFCPeriodB RFC 6 $toffs2+102.55949 $toffs2+103.48481 $toffs2+105.15056 $toffs2+106.07609 $toffs2+107.74221 $toffs2+108.66794 
+
+HFOFORFCPeriodA RFC 7 $toffs2+110.33443 $toffs2+111.26036 $toffs2+112.92722 $toffs2+113.85335 $toffs2+115.52056 $toffs2+116.44689 
+HFOFORFCPeriodB RFC 7 $toffs2+118.11445 $toffs2+119.04098 $toffs2+120.70889 $toffs2+121.63561 $toffs2+123.30387 $toffs2+124.23077 
+
+HFOFORFCPeriodA RFC 8 $toffs2+125.89938 $toffs2+126.82647 $toffs2+128.49541 $toffs2+129.42269 $toffs2+131.09197 $toffs2+132.01943 
+HFOFORFCPeriodB RFC 8 $toffs2+133.68904 $toffs2+134.61669 $toffs2+136.28662 $toffs2+137.21445 $toffs2+138.8847 $toffs2+139.8127 
+
+HFOFORFCPeriodA RFC 9 $toffs2+141.48328 $toffs2+142.41146 $toffs2+144.08234 $toffs2+145.0107 $toffs2+146.6819 $toffs2+147.61043 
+HFOFORFCPeriodB RFC 9 $toffs2+149.28193 $toffs2+150.21063 $toffs2+151.88244 $toffs2+152.81131 $toffs2+154.48342 $toffs2+155.41245 
+
+HFOFORFCPeriodA RFC1 10 $toffs3+157.08608 $toffs3+158.01528 $toffs3+159.68798 $toffs3+160.61734 $toffs3+162.29033 $toffs3+163.21985 
+HFOFORFCPeriodB RFC1 10 $toffs3+164.89313 $toffs3+165.82281 $toffs3+167.49637 $toffs3+168.42621 $toffs3+170.10005 $toffs3+171.03004 
+
+HFOFORFCPeriodA RFC1 11 $toffs3+172.70416 $toffs3+173.6343 $toffs3+175.3087 $toffs3+176.23899 $toffs3+177.91366 $toffs3+178.8441 
+HFOFORFCPeriodB RFC1 11 $toffs3+180.51904 $toffs3+181.44963 $toffs3+183.12483 $toffs3+184.05557 $toffs3+185.73103 $toffs3+186.66191 
+
+HFOFORFCPeriodA RFC1 12 $toffs3+188.33763 $toffs3+189.26866 $toffs3+190.94463 $toffs3+191.8758 $toffs3+193.55203 $toffs3+194.48333 
+HFOFORFCPeriodB RFC1 12 $toffs3+196.15981 $toffs3+197.09126 $toffs3+198.76798 $toffs3+199.69956 $toffs3+201.37653 $toffs3+202.30825 
+
+HFOFORFCPeriodA RFC1 13 $toffs3+203.98546 $toffs3+204.91731 $toffs3+206.59476 $toffs3+207.52674 $toffs3+209.20442 $toffs3+210.13653 
+HFOFORFCPeriodB RFC1 13 $toffs3+211.81445 $toffs3+212.74669 $toffs3+214.42484 $toffs3+215.35721 $toffs3+217.03558 $toffs3+217.96807 
+
+HFOFORFCPeriodA RFC1 14 $toffs3+219.64667 $toffs3+220.57929 $toffs3+222.25811 $toffs3+223.19086 $toffs3+224.8699 $toffs3+225.80276 
+HFOFORFCPeriodB RFC1 14 $toffs3+227.48202 $toffs3+228.415 $toffs3+230.09448 $toffs3+231.02758 $toffs3+232.70726 $toffs3+233.64048 
+
+HFOFORFCPeriodA RFC1 15 $toffs3+235.32038 $toffs3+236.25371 $toffs3+237.93382 $toffs3+238.86727 $toffs3+240.54757 $toffs3+241.48114 
+HFOFORFCPeriodB RFC1 15 $toffs3+243.16165 $toffs3+244.09532 $toffs3+245.77603 $toffs3+246.70982 $toffs3+248.39073 $toffs3+249.32462 
+
+HFOFORFCPeriodA RFC1 16 $toffs3+251.00573 $toffs3+251.93973 $toffs3+253.62103 $toffs3+254.55514 $toffs3+256.23663 $toffs3+257.17084 
+HFOFORFCPeriodB RFC1 16 $toffs3+258.85252 $toffs3+259.78684 $toffs3+261.46871 $toffs3+262.40313 $toffs3+264.08518 $toffs3+265.0197 
+
+HFOFORFCPeriodA RFC1 17 $toffs3+266.70194 $toffs3+267.63656 $toffs3+269.31898 $toffs3+270.2537 $toffs3+271.93629 $toffs3+272.87111 
+HFOFORFCPeriodB RFC1 17 $toffs3+274.55388 $toffs3+275.4888 $toffs3+277.17175 $toffs3+278.10676 $toffs3+279.78988 $toffs3+280.72499 
+
+HFOFORFCPeriodA RFC1 18 $toffs3+282.40827 $toffs3+283.34348 $toffs3+285.02693 $toffs3+285.96223 $toffs3+287.64585 $toffs3+288.58124 
+HFOFORFCPeriodB RFC1 18 $toffs3+290.26502 $toffs3+291.2005 $toffs3+292.88445 $toffs3+293.82002 $toffs3+295.50412 $toffs3+296.43978 
+
+HFOFORFCPeriodA RFC1 19 $toffs3+298.12405 $toffs3+299.05979 $toffs3+300.74421 $toffs3+301.68005 $toffs3+303.36462 $toffs3+304.30054 
+HFOFORFCPeriodB RFC1 19 $toffs3+305.98527 $toffs3+306.92127 $toffs3+308.60616 $toffs3+309.54224 $toffs3+311.22727 $toffs3+312.16344 
+
+HFOFORFCPeriodA RFC2 20 $toffs4+313.85048 $toffs4+314.78673 $toffs4+316.47206 $toffs4+317.40839 $toffs4+319.09386 $toffs4+320.03027 
+HFOFORFCPeriodB RFC2 20 $toffs4+321.71588 $toffs4+322.65237 $toffs4+324.33813 $toffs4+325.27469 $toffs4+326.96059 $toffs4+327.89723 
+
+HFOFORFCPeriodA RFC2 21 $toffs4+329.58326 $toffs4+330.51998 $toffs4+332.20615 $toffs4+333.14295 $toffs4+334.82925 $toffs4+335.76612 
+HFOFORFCPeriodB RFC2 21 $toffs4+337.45255 $toffs4+338.3895 $toffs4+340.07606 $toffs4+341.01308 $toffs4+342.69978 $toffs4+343.63686 
+
+HFOFORFCPeriodA RFC2 22 $toffs4+345.32369 $toffs4+346.26085 $toffs4+347.9478 $toffs4+348.88503 $toffs4+350.57211 $toffs4+351.50941 
+HFOFORFCPeriodB RFC2 22 $toffs4+353.19661 $toffs4+354.13397 $toffs4+355.8213 $toffs4+356.75873 $toffs4+358.44618 $toffs4+359.38368 
+
+HFOFORFCPeriodA RFC2 23 $toffs4+361.07124 $toffs4+362.00881 $toffs4+363.69649 $toffs4+364.63413 $toffs4+366.32193 $toffs4+367.25962 
+HFOFORFCPeriodB RFC2 23 $toffs4+368.94754 $toffs4+369.8853 $toffs4+371.57333 $toffs4+372.51115 $toffs4+374.1993 $toffs4+375.13718 
+
+HFOFORFCPeriodA RFC2 24 $toffs4+376.82544 $toffs4+377.76339 $toffs4+379.45175 $toffs4+380.38976 $toffs4+382.07823 $toffs4+383.0163 
+HFOFORFCPeriodB RFC2 24 $toffs4+384.70488 $toffs4+385.64301 $toffs4+387.3317 $toffs4+388.26989 $toffs4+389.95868 $toffs4+390.89693 
+
+HFOFORFCPeriodA RFC2 25 $toffs4+392.58582 $toffs4+393.52413 $toffs4+395.21312 $toffs4+396.15148 $toffs4+397.84058 $toffs4+398.779 
+HFOFORFCPeriodB RFC2 25 $toffs4+400.4682 $toffs4+401.40667 $toffs4+403.09597 $toffs4+404.0345 $toffs4+405.7239 $toffs4+406.66248 
+
+HFOFORFCPeriodA RFC2 26 $toffs4+408.35197 $toffs4+409.29061 $toffs4+410.9802 $toffs4+411.91889 $toffs4+413.60857 $toffs4+414.54731 
+HFOFORFCPeriodB RFC2 26 $toffs4+416.23709 $toffs4+417.17588 $toffs4+418.86575 $toffs4+419.80459 $toffs4+421.49456 $toffs4+422.43345 
+
+HFOFORFCPeriodA RFC2 27 $toffs4+424.1235 $toffs4+425.06244 $toffs4+426.75259 $toffs4+427.69158 $toffs4+429.38181 $toffs4+430.32085 
+HFOFORFCPeriodB RFC2 27 $toffs4+432.01116 $toffs4+432.95025 $toffs4+434.64066 $toffs4+435.57979 $toffs4+437.27028 $toffs4+438.20946 
+
+HFOFORFCPeriodA RFC2 28 $toffs4+439.90004 $toffs4+440.83927 $toffs4+442.52992 $toffs4+443.4692 $toffs4+445.15993 $toffs4+446.09926 
+HFOFORFCPeriodB RFC2 28 $toffs4+447.79007 $toffs4+448.72944 $toffs4+450.42034 $toffs4+451.35975 $toffs4+453.05073 $toffs4+453.99018 
+
+HFOFORFCPeriodA RFC2 29 $toffs4+455.68124 $toffs4+456.62073 $toffs4+458.31187 $toffs4+459.25141 $toffs4+460.94262 $toffs4+461.8822 
+HFOFORFCPeriodB RFC2 29 $toffs4+463.57349 $toffs4+464.51311 $toffs4+466.20447 $toffs4+467.14414 $toffs4+468.83557 $toffs4+469.77528 
+
+HFOFORFCPeriodA RFC2 30 $toffs5+471.47549 $toffs5+472.41522 $toffs5+474.10672 $toffs5+475.04645 $toffs5+476.73795 $toffs5+477.67768 
+HFOFORFCPeriodB RFC2 30 $toffs5+479.36919 $toffs5+480.30891 $toffs5+482.00042 $toffs5+482.94015 $toffs5+484.63165 $toffs5+485.57138 
+
+
+### Absorber tubes 
+### One between each pair of solenoids -- in main periods, one before each (6*31 - 1 = 185 total)
+# Periods 1-30 
+do i 1 30
+
+    do j 0 5
+
+        place abtube x=0 y=0 z=$abszinitial+($j*$spacing)+($i*$period)
+
+    enddo
+
+enddo
+
+### Wedge absorbers
+### Six in each period except for first, second, and last   
+### None in first and last, three in second -> (0 + 3 + 6*28 + 0 = 171 total)
+
+# Period 1
+place wedge0 x=-79.11 y=-155.4 rotation=Y90,Z333.0 z=2250+$period*1 lowerWidth=59.326
+place wedge0 x=174.2 y=9.204 rotation=Y90,Z453.0 z=2950+$period*1 lowerWidth=58.783
+place wedge0 x=-95.05 y=146.2 rotation=Y90,Z573.0 z=3650+$period*1 lowerWidth=58.239 
+
+# Periods 2 - 29
+WedgeFullPeriod 2 57.694 57.150 56.607 56.066 55.527 54.990
+WedgeFullPeriod 3 54.457 53.928 53.403 52.882 52.367 51.856
+WedgeFullPeriod 4 51.351 50.851 50.357 49.870 49.388 48.913
+WedgeFullPeriod 5 48.444 47.982 47.527 47.078 46.636 46.201
+WedgeFullPeriod 6 45.773 45.352 44.938 44.530 44.130 43.737
+WedgeFullPeriod 7 43.350 42.970 42.597 42.231 41.872 41.519
+WedgeFullPeriod 8 41.173 40.834 40.501 40.175 39.855 39.541
+WedgeFullPeriod 9 39.233 38.932 38.636 38.347 38.064 37.786
+WedgeFullPeriod 10 37.514 37.248 36.988 36.733 36.483 36.238
+WedgeFullPeriod 11 35.999 35.765 35.536 35.312 35.093 34.879
+WedgeFullPeriod 12 34.670 34.465 34.264 34.068 33.877 33.690
+WedgeFullPeriod 13 33.507 33.328 33.153 32.982 32.815 32.652
+WedgeFullPeriod 14 32.493 32.337 32.185 32.036 31.891 31.749
+WedgeFullPeriod 15 31.611 31.476 31.344 31.215 31.089 30.967
+WedgeFullPeriod 16 30.847 30.730 30.615 30.504 30.395 30.289
+WedgeFullPeriod 17 30.185 30.084 29.986 29.889 29.795 29.704
+WedgeFullPeriod 18 29.614 29.527 29.442 29.359 29.278 29.200
+WedgeFullPeriod 19 29.123 29.048 28.975 28.903 28.834 28.766
+WedgeFullPeriod 20 28.700 28.636 28.573 28.512 28.452 28.394
+WedgeFullPeriod 21 28.338 28.282 28.229 28.176 28.125 28.076
+WedgeFullPeriod 22 28.027 27.980 27.934 27.890 27.846 27.804
+WedgeFullPeriod 23 27.763 27.723 27.683 27.645 27.608 27.572
+WedgeFullPeriod 24 27.537 27.503 27.470 27.437 27.406 27.375
+WedgeFullPeriod 25 27.346 27.317 27.288 27.261 27.234 27.209
+WedgeFullPeriod 26 27.183 27.159 27.135 27.112 27.089 27.068
+WedgeFullPeriod 27 27.046 27.026 27.006 26.986 26.967 26.949
+WedgeFullPeriod 28 26.931 26.914 26.897 26.881 26.865 26.849
+WedgeFullPeriod 29 26.834 26.820 26.806 26.792 26.779 26.766
+
+# Period 30 
+# None in last section
+
+### Detectors
+### One after each period (31) + one at the very end (1) -> 32 total
+
+do i 1 $np
+
+    place Det$i z=-9.8+$zshift+$period*$i
+
+enddo
+
+#===========================================
+
+
+#--------------------------------------------
+# Exit : z -> [4200*($np+1), 4200*($np+1) + 2000]
+
+### Solenoids
+place SolPos z=500+$period*31 current=$cur5
+place RotSol z=4050+$period*31
+
+### RFCs
+place RFC2 z=130575 timeOffset=$toffs5+487.26288
+place RFC2 z=130825 timeOffset=$toffs5+488.20261
+place RFC2 z=131275 timeOffset=$toffs5+489.89412
+place RFC2 z=131525 timeOffset=$toffs5+490.83384
+
+### Absorber tubes
+# None 
+
+### Detectors
+place DetLast z=$zlastRF+100
+
+#===========================================
+
+
+
+
+
+
+
+
+
+

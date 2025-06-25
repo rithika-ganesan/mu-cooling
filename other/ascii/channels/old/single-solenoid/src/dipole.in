@@ -1,0 +1,24 @@
+# Display magnetic field lines for a number of solenoids
+
+# physics 
+physics QGSP_BERT
+
+# display magnetic field lines
+fieldlines exit=0 center=0,0,0 nLines=100
+
+# define coil and solenoid, add transparency to see lines inside
+coil C innerRadius=200 outerRadius=250 length=100
+solenoid Sp coil=C current=120 color=1,0,0,0.3
+solenoid Sn coil=C current=-120 color=0,0,1,0.3
+
+# place elements
+param dist=500
+param nsol=4
+param maxn=$nsol-1
+
+do i 0 $maxn
+
+    param zloc=($i-($maxn/2))*$dist
+    place Sp z=$zloc
+ 
+enddo

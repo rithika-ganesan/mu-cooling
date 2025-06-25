@@ -1,0 +1,375 @@
+G4BL_DIR=/Applications/G4beamline-3.08.app/Contents
+LD_LIBRARY_PATH='/Applications/G4beamline-3.08.app/Contents/lib:'
+G4ABLADATA=/Users/rithika/code/Geant4Data/G4ABLA3.1
+G4LEDATA=/Users/rithika/code/Geant4Data/G4EMLOW8.0
+G4ENSDFSTATEDATA=/Users/rithika/code/Geant4Data/G4ENSDFSTATE2.3
+G4INCLDATA=/Users/rithika/code/Geant4Data/G4INCL1.0
+G4NEUTRONHPDATA=/Users/rithika/code/Geant4Data/G4NDL4.6
+G4PARTICLEXSDATA=/Users/rithika/code/Geant4Data/G4PARTICLEXS4.0
+G4PIIDATA=/Users/rithika/code/Geant4Data/G4PII1.3
+G4LEVELGAMMADATA=/Users/rithika/code/Geant4Data/PhotonEvaporation5.7
+G4RADIOACTIVEDATA=/Users/rithika/code/Geant4Data/RadioactiveDecay5.6
+G4REALSURFACEDATA=/Users/rithika/code/Geant4Data/RealSurface2.2
+G4SAIDXSDATA=/Users/rithika/code/Geant4Data/G4SAIDDATA2.0
+G4TENDLDATA=/Users/rithika/code/Geant4Data/G4TENDL1.4
+G4beamline Process ID 27057
+
+*************************************************************
+ g4beamline version: 3.08                        (Oct  8 2022)
+                      Copyright : Tom Roberts, Muons, Inc.
+                        License : Gnu Public License
+                            WWW : http://g4beamline.muonsinc.com
+
+          ################################
+          !!! G4Backtrace is activated !!!
+          ################################
+
+
+**************************************************************
+ Geant4 version Name: geant4-11-00-patch-02 [MT]   (25-May-2022)
+                       Copyright : Geant4 Collaboration
+                      References : NIM A 506 (2003), 250-303
+                                 : IEEE-TNS 53 (2006), 270-278
+                                 : NIM A 835 (2016), 186-225
+                             WWW : http://geant4.org/
+**************************************************************
+
+param        viewer        best,1
+geometry                   nPoints=100 printGeometry=0 visual=0
+                           tolerance=0.002
+param        pi            3.1415926
+G4PhysListFactory::GetReferencePhysList <QGSP_BIC>  EMoption= 0
+<<< Geant4 Physics List simulation engine: QGSP_BIC
+
+
+physics      QGSP_BIC      disable= inactivate= deactivate= doStochastics=1
+                           fluct=1 minRangeCut=1 list=0 gammaToMuPair=0
+                           spinTracking=0 synchrotronRadiation=0
+                           synchrotronRadiationMuon=0 maxTime=1e+06
+material GH2    Z=1.00 A=1.01
+                density=0.014 temperature=273 pressure=1.0
+param        worldMaterial GH2
+param        zshift        6
+param        period        4200
+trackcuts                  kill= keep=mu+,mu-,pi+,pi- killSecondaries=0
+                           kineticEnergyCut=50 kineticEnergyMax=1.798e+308
+                           maxTime=1e+06 keepPrimaries=0 steppingVerbose=0
+param        maxStep       100.0
+param        nTrace        0
+param        steppingVerbose 0
+param        beamstart     -700
+param        beamtime      -0.671
+param        toffs0        1.7962431
+param        toffs1        1.7501431
+beam    GAUSSIAN particle=mu+ nEvents=100 firstEvent=-1 lastEvent=2147483647 beamX=0.0 beamY=0.0 beamZ=-700.0 maxR=1000000.0 
+		meanMomentum=200.0 weight=1.000000 
+		sigmaX=10.0 sigmaY=10.0 sigmaZ=0.0 sigmaXp=0.10000 sigmaYp=0.10000 
+		sigmaP=4.0 sigmaT=0.000 meanXp=0.00000 meanYp=0.00000 meanT=0.000 
+param        Grad          25
+param        Grad0         20
+pillbox      RFC0          maxGradient=20 color=1.0,0.0,0.0 frequency=0.325
+                           innerLength=249 innerRadius=353.1 pipeThick=0.4
+                           wallThick=0.4 irisRadius=300 collarRadialThick=0
+                           collarThick=0 win1Thick=0 win1OuterRadius=0
+                           win2Thick=0.12 winMat=Be phaseAcc=40
+                           skinDepth=0.002 timingTolerance=0.001 maxStep=100
+                           cavityMaterial=Vacuum timeOffset=-4.7e+21
+                           timeIncrement=0 fieldMapFile= kill=0
+pillbox      RFC           maxGradient=25 color=1.0,0.0,0.0 frequency=0.325
+                           innerLength=249 innerRadius=353.1 pipeThick=0.4
+                           wallThick=0.4 irisRadius=300 collarRadialThick=0
+                           collarThick=0 win1Thick=0 win1OuterRadius=0
+                           win2Thick=0.12 winMat=Be phaseAcc=40
+                           skinDepth=0.002 timingTolerance=0.001 maxStep=100
+                           cavityMaterial=GH2 timeOffset=-4.7e+21
+                           timeIncrement=0 fieldMapFile= kill=1
+tubs         abtube        innerRadius=500 outerRadius=550 initialPhi=0
+                           finalPhi=360 length=160 maxStep=100 material=Vacuum
+                           color=invisible kill=1 radius=550
+tubs         terminus      innerRadius=0 outerRadius=360 initialPhi=0
+                           finalPhi=360 length=1 maxStep=100 material=Vacuum
+                           color=1,1,1 kill=1 radius=360
+tubs         presswall     innerRadius=0 outerRadius=360 initialPhi=0
+                           finalPhi=360 length=4 maxStep=100
+                           material=Stainless316 color=invisible kill=0
+                           radius=360
+coil    kat0    innerRadius=360.0 outerRadius=500.0 length=6000.0 material=Cu 
+		tolerance=0.003 nSheets=10 
+		maxR=360.0 maxZ=9000.0 dR=20.0 dZ=20.0 filename=kat0.dat 
+coilmap kat0    tolerance=0.00300 [fraction of Bz(r=0,z=0)]
+coilmap kat0    read file 'kat0.dat'  dR=20.0 dZ=20.0
+solenoid     RotSol        coilName=kat0 current=11.37 color=1,1,1 alternate=0
+                           kill=1 coil=kat0
+coil    kat11   innerRadius=420.0 outerRadius=600.0 length=300.0 material=Cu 
+		tolerance=0.003 nSheets=10 
+		maxR=360.0 maxZ=6000.0 dR=15.0 dZ=15.0 filename=kat11.dat 
+coilmap kat11   tolerance=0.00300 [fraction of Bz(r=0,z=0)]
+coilmap kat11   read file 'kat11.dat'  dR=15.0 dZ=15.0
+param        pitch         -0.14323945
+param        BLS           21.4
+param        delf          0
+param        cur0          94.6094
+param        curmn         -94.6094
+param        curpl         94.6094
+param        cur1          48.54258
+param        cur2          -79.09169
+param        cur3          86.82844
+param        cur4          -93.37152
+param        pitch3        0.08864577034195348
+param        roll3         -122.41026
+param        pitch4        0.12464581967694571
+param        roll4         -23.560571
+param        pitch5        0.08629462092385154
+param        roll5         122.33834527427146
+param        pitch6        0.08165184417494886
+param        roll6         -102.00443
+solenoid     SolPos        coilName=kat11 current=94.61 color=1,0,1
+                           alternate=0 kill=1 coil=kat11
+solenoid     SolNeg        coilName=kat11 current=-94.61 color=0,0,1
+                           alternate=0 kill=1 coil=kat11
+place   terminus copies=1 x=0.0 y=0.0 z=-1000.0 
+place   RFC0    copies=1 x=0.0 y=0.0 z=-425.0 
+                timeOffset=1.7962431-0.77123842
+place   RFC0    copies=1 x=0.0 y=0.0 z=-175.0 
+                timeOffset=1.7962431+0.13491993
+place   RFC0    copies=1 x=0.0 y=0.0 z=75.0 
+                timeOffset=1.7962431+1.0410783
+place   RFC0    copies=1 x=0.0 y=0.0 z=325.0 
+                timeOffset=1.7962431+1.9472366
+place   RFC0    copies=1 x=0.0 y=0.0 z=575.0 
+                timeOffset=1.7962431+2.853395
+place   presswall copies=1 x=0.0 y=0.0 z=850.0 
+place   abtube  copies=1 x=0.0 y=0.0 z=850.0 
+place   abtube  copies=1 x=0.0 y=0.0 z=1550.0 
+place   abtube  copies=1 x=0.0 y=0.0 z=2250.0 
+place   abtube  copies=1 x=0.0 y=0.0 z=2950.0 
+place   abtube  copies=1 x=0.0 y=0.0 z=3650.0 
+trace                      nTrace=10 format=asciiTrace oneNTuple=1
+                           primaryOnly=0 traceTune=1
+                           filename=../output/trace_test.txt
+                           file=../output/trace_test.txt require=
+                           coordinates=Centerline
+
+World size (before incrementing by 201.357 mm): 1100.0 H  1100.0 W  7460.0 L
+
+PARAMETERS:
+            BLS=21.4
+           Grad=25
+          Grad0=20
+            Zcl=3730
+      beamstart=-700
+       beamtime=-0.671
+           cur0=94.6094
+           cur1=48.54258
+           cur2=-79.09169
+           cur3=86.82844
+           cur4=-93.37152
+          curmn=-94.6094
+          curpl=94.6094
+           delf=0
+     deltaChord=3.0
+deltaIntersection=0.1
+   deltaOneStep=0.01
+         epsMax=0.05
+         epsMin=2.5e-7
+ eventTimeLimit=30
+    fieldVoxels=200,200,200
+      histoFile=g4beamline
+    histoUpdate=0
+        maxStep=100.0
+        minStep=0.01
+         nTrace=0
+         period=4200
+             pi=3.1415926
+          pitch=-0.14323945
+         pitch3=0.08864577034195348
+         pitch4=0.12464581967694571
+         pitch5=0.08629462092385154
+         pitch6=0.08165184417494886
+          roll3=-122.41026
+          roll4=-23.560571
+          roll5=122.33834527427146
+          roll6=-102.00443
+ steppingFormat=N GLOBAL CL KE STEP VOL PROCESS
+steppingVerbose=0
+         toffs0=1.7962431
+         toffs1=1.7501431
+         viewer=best,1
+ wallClockLimit=-1
+  worldMaterial=GH2
+     zTolerance=2.0
+         zshift=6
+Checking overlaps for volume terminus:0 (G4Tubs) ... OK! 
+BLCMDtubs::Construct terminus parent= relZ=-1000.0 globZ=-1000.0
+	zmin=-1000.5 zmax=-999.5 kill=1
+Checking overlaps for volume RFC0Pipe:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0UsWall:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0DsWall:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0UsWin2:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0DsWin2:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0DsHalf:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0TimingVol:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0:0 (G4Tubs) ... OK! 
+BLCMDpillbox::construct RFC0 parent= relZ=-425.0 globZ=-425.0
+	zmin=-549.9 zmax=-300.1
+Checking overlaps for volume RFC0Pipe:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0UsWall:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0DsWall:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0UsWin2:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0DsWin2:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0DsHalf:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0TimingVol:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0:0 (G4Tubs) ... OK! 
+BLCMDpillbox::construct RFC0 parent= relZ=-175.0 globZ=-175.0
+	zmin=-299.9 zmax=-50.1
+Checking overlaps for volume RFC0Pipe:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0UsWall:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0DsWall:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0UsWin2:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0DsWin2:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0DsHalf:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0TimingVol:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0:0 (G4Tubs) ... OK! 
+BLCMDpillbox::construct RFC0 parent= relZ=75.0 globZ=75.0
+	zmin=-49.9 zmax=199.9
+Checking overlaps for volume RFC0Pipe:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0UsWall:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0DsWall:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0UsWin2:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0DsWin2:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0DsHalf:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0TimingVol:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0:0 (G4Tubs) ... OK! 
+BLCMDpillbox::construct RFC0 parent= relZ=325.0 globZ=325.0
+	zmin=200.1 zmax=449.9
+Checking overlaps for volume RFC0Pipe:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0UsWall:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0DsWall:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0UsWin2:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0DsWin2:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0DsHalf:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0TimingVol:0 (G4Tubs) ... OK! 
+Checking overlaps for volume RFC0:0 (G4Tubs) ... OK! 
+BLCMDpillbox::construct RFC0 parent= relZ=575.0 globZ=575.0
+	zmin=450.1 zmax=699.9
+Checking overlaps for volume presswall:0 (G4Tubs) ... OK! 
+BLCMDtubs::Construct presswall parent= relZ=850.0 globZ=850.0
+	zmin=848.0 zmax=852.0 kill=0
+Checking overlaps for volume abtube:0 (G4Tubs) ... OK! 
+BLCMDtubs::Construct abtube parent= relZ=850.0 globZ=850.0
+	zmin=770.0 zmax=930.0 kill=1
+Checking overlaps for volume abtube:0 (G4Tubs) ... OK! 
+BLCMDtubs::Construct abtube parent= relZ=1550.0 globZ=1550.0
+	zmin=1470.0 zmax=1630.0 kill=1
+Checking overlaps for volume abtube:0 (G4Tubs) ... OK! 
+BLCMDtubs::Construct abtube parent= relZ=2250.0 globZ=2250.0
+	zmin=2170.0 zmax=2330.0 kill=1
+Checking overlaps for volume abtube:0 (G4Tubs) ... OK! 
+BLCMDtubs::Construct abtube parent= relZ=2950.0 globZ=2950.0
+	zmin=2870.0 zmax=3030.0 kill=1
+Checking overlaps for volume abtube:0 (G4Tubs) ... OK! 
+BLCMDtubs::Construct abtube parent= relZ=3650.0 globZ=3650.0
+	zmin=3570.0 zmax=3730.0 kill=1
+### Adding tracking cuts for neutron  TimeCut(ns)= 10000  KinEnergyCut(MeV)= 0
+
+Geometry test nPoints=100 tolerance=0.002 mm:
+Testing geometry for children of group 'World':
+Total geometry errors = 0  0 seconds
+
+================== Prepare Visualization ==================
+Stochastic processes are enabled.
+Available UI session types: [ Qt, tcsh, csh ]
+Visualization Manager instantiating with verbosity "warnings (3)"...
+Visualization Manager initialising...
+Registering graphics systems...
+
+You have successfully registered the following graphics systems.
+Registered graphics systems are:
+  ASCIITree (ATree)
+  DAWNFILE (DAWNFILE)
+  G4HepRepFile (HepRepFile)
+  RayTracer (RayTracer)
+  VRML2FILE (VRML2FILE)
+  gMocrenFile (gMocrenFile)
+  OpenGLImmediateQt (OGLIQt, OGLI)
+  OpenGLStoredQt (OGLSQt, OGL, OGLS)
+  Qt3D (Qt3D)
+
+Registering model factories...
+
+You have successfully registered the following model factories.
+Registered model factories:
+  generic
+  drawByAttribute
+  drawByCharge
+  drawByOriginVolume
+  drawByParticleID
+  drawByEncounteredVolume
+
+Registered models:
+  None
+
+Registered filter factories:
+  attributeFilter
+  chargeFilter
+  originVolumeFilter
+  particleFilter
+  encounteredVolumeFilter
+
+Registered filters:
+  None
+
+You have successfully registered the following user vis actions.
+Run Duration User Vis Actions: none
+End of Event User Vis Actions: none
+End of Run User Vis Actions: none
+
+Some /vis commands (optionally) take a string to specify colour.
+"/vis/list" to see available colours.
+
+Selected visualization viewer: Qt
+BLVisManager init: /vis/open OGLSQt
+BLVisManager init: /vis/viewer/set/auxiliaryEdge true
+BLVisManager init: /vis/viewer/set/style surface
+BLVisManager init: /vis/viewer/set/viewpointThetaPhi 0 0 deg
+BLVisManager init: /vis/drawVolume
+BLVisManager init: /tracking/storeTrajectory 1
+BLVisManager init: /vis/scene/add/trajectories
+/tracking/storeTrajectory 1
+Attributes available for modeling and filtering with
+  "/vis/modeling/trajectories/create/drawByAttribute" and
+  "/vis/filtering/trajectories/create/attributeFilter" commands:
+G4TrajectoriesModel:
+  Event ID (EventID): G4int
+  Run ID (RunID): G4int
+G4Trajectory:
+  Charge (Ch): unit: e+ (G4double)
+  Track ID (ID): G4int
+  Initial kinetic energy (IKE): G4BestUnit (G4double)
+  Initial momentum magnitude (IMag): G4BestUnit (G4double)
+  Initial momentum (IMom): G4BestUnit (G4ThreeVector)
+  No. of points (NTP): G4int
+  PDG Encoding (PDG): G4int
+  Parent ID (PID): G4int
+  Particle Name (PN): G4String
+G4TrajectoryPoint:
+  Position (Pos): G4BestUnit (G4ThreeVector)
+WARNING: Trajectory storing has been requested.  This action may be
+  reversed with "/tracking/storeTrajectory 0".
+BLVisManager init: /vis/scene/endOfEventAction accumulate -1
+WARNING: The vis manager will keep an unlimited number of events.
+  This may use a lot of memory.
+  It may be changed with, e.g., "/vis/scene/endOfEventAction accumulate 10".
+BLVisManager init: /vis/viewer/set/hiddenMarker true
+
+WARNING: No extent set for user vis action "DrawMarkers".
+WARNING: User Vis Action "DrawMarkers" extent is null.
+ Changing export format to "jpg"
+2025-06-16 14:39:20.640 g4bl[27057:30848857] +[IMKClient subclass]: chose IMKClient_Modern
+2025-06-16 14:39:20.640 g4bl[27057:30848857] +[IMKInputSession subclass]: chose IMKInputSession_Modern
+
+Graphics systems deleted.
+Visualization Manager deleting...
+
+Exceptions: 0 Fatal, 0 Events Aborted, 0 Stuck Tracks (stopped), 0 Warnings
+g4beamline: simulation complete
