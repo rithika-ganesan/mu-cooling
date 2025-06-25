@@ -1,4 +1,17 @@
-## Week 4 (June 23, 2025 - June 27, 2025)
+# 6D Beam Matching In Helical FOFO Channels For Muon Cooling
+## Lab notebook 
+
+If you are reading this, I am still in the process of retroactively adding my previous work to this file! (I tried using Google Docs but it did not work for me so I am returning to markdown.)
+
+## Week 0 (May 27, 2025 - May 30, 2025)
+
+## Week 1 (Jun 02, 2025 - Jun 06, 2025)
+
+## Week 2 (Jun 09, 2025 - Jun 13, 2025)
+
+## Week 3 (Jun 16, 2025 - Jun 20, 2025)
+
+## Week 4 (Jun 23, 2025 - Jun 27, 2025)
 
 Overdue tasks:
 
@@ -45,10 +58,16 @@ Overdue tasks:
 ### Wednesday | June 25, 2025
 
 **To-do:**
-- [ ] Fix code from yesterday
-- [ ] Plot xy orbit for current HFOFO input
-- [ ]
-- [ ]
+- [x] ~Fix code from yesterday~
+- [x] ~Plot xy orbit for original HFOFO input~
+- [ ] Plot orbit for reduced current HFOFO input
+    - [x] ~Write script to print macros with reduced currents~
+    - [x] ~Generate input file with reduced currents~
+    - [x] ~Generate root file~
+    - [ ] Make plots
+- [ ] Computing/organization
+    - [ ] Generalize 'place_currents.sh' into a function and add to .g4bl_bash
+    - [ ] Figure out how to pass arguments from a function to subcomponents
 
 **Log:**
 - Git:
@@ -64,7 +83,24 @@ Overdue tasks:
     ```
     git checkout --orphan main
     git commit -m "test main"
+    git push origin main
     ```
+    - Command to check ls for branch: `git ls-tree -r main --name-only`
+    - Deleted everything from branch main 
+    - Will return to this later
+- Checking orbit for original file:
+    - Running docker in a test branch produces some kind of segmentation error -> root file still produced and is seemingly fine
+    - output: `hfofotest.root`
+    - Added issue for `read.read_trace` not producing full dataframe as well
+    - Ran original file and plotted a few things. 
+- Checking orbit for reduced currents:
+    - Writing a script that takes a text file (?) of currents and generates commands we can add to input files -> place_currents.sh
+    - Text file with currents: `input/hfofo-reduced-currents.txt` (Generated in Google Sheets)
+    - output: `hfofo-reducedcurrents.root`
+    - From plots: There seems to be a small section (z=4200 to z=6300) that seems to be roughly matched, but the matching section is not -- which means this will change as well. The output file has far fewer entries than the original version -- I am unsure why. The momenta do not go to zero, and the particle doesn't leave the channel either. 
+    - What I think I should do next:
+        - See if the original file is matched.
+        - Drop the matching section, find conditions for the whole channel to form a steady orbit, then return to the matching section.
+    - I think Caroline attempted both of these, so her older presentations might have something?
 
 
-    - 
