@@ -11,6 +11,14 @@ import numpy as np
 
 #============== Functions ===============
 
+# Initialize a plot along the z axis
+def plot_long(x_axis, x=None):
+    fig, ax = plt.subplots(figsize=(8, 6))
+    fig.dpi = 300
+    ax.set_xlabel('z (mm)')
+    ax.set_ylabel(x_axis)
+    return fig, ax
+
 # Initialize a plot in the x-y plane
 def plot_transverse(L=500, ticks='limits'):
     fig, ax = plt.subplots(figsize=(6, 6))
@@ -37,5 +45,7 @@ def add_vector(ax, x=None, y=None, r=None, phi=None, clr=None, label=None):
     ax.plot([0, x], [0, y], lw=1, c=clr)
     ax.scatter([x], [y], s=5, c=clr, label=label)
     return ax
+
+
 
 
