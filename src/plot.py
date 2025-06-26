@@ -11,6 +11,14 @@ import numpy as np
 
 #============== Functions ===============
 
+# Initialize a plot along the z axis
+def plot_long(x_axis, x=None):
+    fig, ax = plt.subplots(figsize=(8, 6))
+    fig.dpi = 300
+    ax.set_xlabel('z (mm)')
+    ax.set_ylabel(x_axis)
+    return fig, ax
+
 # Initialize a plot in the x-y plane
 def plot_transverse(L=500, ticks='limits'):
     fig, ax = plt.subplots(figsize=(6, 6))
@@ -37,5 +45,31 @@ def add_vector(ax, x=None, y=None, r=None, phi=None, clr=None, label=None):
     ax.plot([0, x], [0, y], lw=1, c=clr)
     ax.scatter([x], [y], s=5, c=clr, label=label)
     return ax
+
+# Make histograms of different columns in a dataframe
+# If saving plots, set save = path to directory to save in
+# To modify individual axes, store plots dict in variable with show save both 0
+def make_histograms(df, show=1, save=0, exclude=[None], title=None, bins=50):
+    plots = {}
+    for col in df.columns:
+        if col not in exclude:
+            vals = df[col]
+            fig, ax = plt.subplots(figsize=(6, 4))
+            fig.dpi = 300
+            ax.hist(vals, bins=bins, alpha=0.7)
+            ax.set_xlabel(f'{col}')
+            if title:
+                ax.set_title(f'{title} {col}')
+            fig.tight_layout()
+            plots[col] = [fig, ax]
+            if save != 0:
+                plt.savefig(f'{save}/{col}.png')
+            if show == 1:
+                plt.show()
+            if show == 0 and save == 0:
+                plt.close(fig)
+    
+    return plots
+
 
 

@@ -124,7 +124,7 @@ def read_trace(filepaths, label_fn=path_label):
         paths = sorted([glob.glob(path) for path in filepaths])
     else:
         raise ValueError("Unknown path type. Use a list of strings or a regex string.")
-    
+
     data = {}
     for n, path in enumerate(paths):
         label = label_fn(path, n)
