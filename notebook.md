@@ -174,7 +174,22 @@ Overdue tasks:
         - Modifying Caroline's file to not include detectors and seeing what happens
             - No change 
         - Ran the base file I had that just contains all input in a single file -- still very few entries even with stochastics turned off. 
-        
+- Okay -- how do I resolve this as easily as possible? 
+    - World material -- Vacuum!!
+    - Entire RF cavity section -- off?
+    - Wedge absorber material also vacuum
+
+- Changes I am making to the original file to reach CR result:
+    - no changes / no reference
+    - reducing number of events to 10 / no reference
+    - adding reference / 1023
+    - turning stochastics off / 1023
+    - world material vacuum instead of GH2 / 1563
+    - setting both rf grads 0 / 2042
+    - changing beam command / 2042
+    - changing all 4 rf winMat to Vacuum / 2135 
+    - changing 3 rf (all except rfc0) cavityMaterial to Vacuum / 16104
+    - changing wedge absorber material to vacuum / 16055
 
 
 
