@@ -136,9 +136,9 @@ trap wedge0 height=350 length=700 upperWidth=0.005 lowerWidth=59.5 material=LITH
 ### Add a HFOFO period of 6 solenoids
 ### Usage: HFOFOSolPeriod <period-number> poscurrent1 negcurrent1 poscurrent2 negcurrent2 poscurrent3 negcurrent3
 define HFOFOSolPeriod \
-    "place SolPos z=500+$period*$1 current=$2 rotation=X$pitch7,Z$roll7" \
-    "place SolNeg z=1200+$period*$1 current=$3 rotation=X$pitch8,Z$roll8" \
-    "place SolPos z=1900+$period*$1 current=$4 rotation=X$pitch9,Z$roll9" \
+    "place SolPos z=500+$period*$1 current=$2 rotation=X$pitch,Z240" \
+    "place SolNeg z=1200+$period*$1 current=$3 rotation=X$pitch" \
+    "place SolPos z=1900+$period*$1 current=$4 rotation=X$pitch,Z120" \
     "place SolNeg z=2600+$period*$1 current=$5 rotation=X$pitch,Z240" \
     "place SolPos z=3300+$period*$1 current=$6 rotation=X$pitch" \
     "place SolNeg z=4000+$period*$1 current=$7 rotation=X$pitch,Z120" 
@@ -205,7 +205,12 @@ place RFC0 z=-175. timeOffset=$toffs0+0.13491993
 # Matching section : z -> [0, 4200]
 
 ### Solenoids
-HFOFOSolPeriod 0 $cur1 $cur2 $cur3 $cur4 $curpl $curmn
+place SolPos z=500 current=$cur1
+place SolNeg z=1200 current=$cur2
+place SolPos z=1900 current=$cur3 rotation=X$pitch3,Z$roll3
+place SolNeg z=2600 current=$cur4 rotation=X$pitch4,Z$roll4
+place SolPos z=3300 rotation=X$pitch5,Z$roll5
+place SolNeg z=4000 rotation=X$pitch6,Z$roll6
 
 ### RFCs 
 place RFC0 z=75. timeOffset=$toffs0+1.0410783
@@ -245,7 +250,15 @@ place abtube z=3650
 
 ### Solenoids
 
-HFOFOSolPeriod 1 $curpl $curmn $curpl -94.482 94.307 -94.136
+# Period 1
+place SolPos z=500+$period*1 rotation=X$pitch7,Z$roll7
+place SolNeg z=1200+$period*1 rotation=X$pitch8,Z$roll8
+place SolPos z=1900+$period*1 rotation=X$pitch9,Z$roll9
+place SolNeg z=2600+$period*1 current=-94.482 rotation=X$pitch,Z240
+place SolPos z=3300+$period*1 current=94.307 rotation=X$pitch
+place SolNeg z=4000+$period*1 current=-94.136 rotation=X$pitch,Z120
+
+# Periods 2 - 28
 HFOFOSolPeriod 2 93.969 -93.805 93.645 -93.488 93.334 -93.184
 HFOFOSolPeriod 3 93.037 -92.892 92.751 -92.612 92.476 -92.343
 HFOFOSolPeriod 4 92.213 -92.085 91.959 -91.836 91.715 -91.597
@@ -273,8 +286,22 @@ HFOFOSolPeriod 25 85.489 -85.471 85.453 -85.435 85.417 -85.400
 HFOFOSolPeriod 26 85.383 -85.366 85.349 -85.333 85.317 -85.300
 HFOFOSolPeriod 27 85.285 -85.269 85.254 -85.238 85.223 -85.209
 HFOFOSolPeriod 28 85.194 -85.179 85.165 -85.151 85.137 -85.124
-HFOFOSolPeriod 29 85.110 -85.097 85.083 -85.070 85.058 -85.045
-HFOFOSolPeriod 30 $cur9 -$cur9 $cur9 $cur8 $cur7 $cur6
+
+# Period 29
+place SolPos z=500+$period*29 current=85.110 rotation=X$pitch,Z240
+place SolNeg z=1200+$period*29 current=-85.097 rotation=X$pitch
+place SolPos z=1900+$period*29 current=85.083 rotation=X$pitch,Z120
+place SolNeg z=2600+$period*29 current=-85.070 rotation=X$pitch,Z240
+place SolPos z=3300+$period*29 current=85.058 rotation=X$pitch17,Z$roll17
+place SolNeg z=4000+$period*29 current=-85.045 rotation=X$pitch16,Z$roll16
+
+# Period 30
+place SolPos z=500+$period*30 current=$cur9 rotation=X$pitch15,Z$roll15
+place SolNeg z=1200+$period*30 current=-$cur9 rotation=X$pitch14,Z$roll14
+place SolPos z=1900+$period*30 current=$cur9 rotation=X$pitch13,Z$roll13
+place SolNeg z=2600+$period*30 current=$cur8 rotation=X$pitch12,Z$roll12
+place SolPos z=3300+$period*30 current=$cur7 rotation=X$pitch11,Z$roll11
+place SolNeg z=4000+$period*30 current=$cur6
 
 
 ### RFCs
@@ -455,6 +482,7 @@ place RFC2 z=131525 timeOffset=$toffs5+490.83384
 
 ### Detectors
 place DetLast z=$zlastRF+100
+place terminus z=$zlastRF+102
 
 #===========================================
 
